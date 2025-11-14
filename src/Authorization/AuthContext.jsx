@@ -1,35 +1,93 @@
-
+// src/Authorization/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
+import axiosInstance from "./axiosInstance";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [userData, setUserdata] = useState(null);
+  const [authModal, setAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+
+  const [allmedicineIncart, setAllMedicineInCart] = useState([]);
+
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const storedUser = localStorage.getItem("userData");
+    const storedToken = localStorage.getItem("token");
+
+
+    let parsedUser = null;
+
+    if (storedUser) {
+      parsedUser = JSON.parse(storedUser);
+      setUserdata(parsedUser);
+    }
+
+    if (storedToken) {
+      setToken(storedToken);
+    }
+    console.log("auth", parsedUser)
+    if (parsedUser?.dto?.id) {
+      getAllMedicineCartItems(parsedUser.id);
+    }
+
     setLoading(false);
   }, []);
 
-  const login = async (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const getAllMedicineCartItems = async (userId) => {
+
+    try {
+      const response = await axiosInstance.get(
+        `/endUserEndPoint/getCartItems?userId=${userId}`
+      );
+      const allItems = response.data?.dtoList || [];
+      const filteredItems = allItems.filter(
+        item => item.addedByPharmacyId === 0
+      );
+
+      setAllMedicineInCart(filteredItems);
+      console.log("Filtered Medicine Cart", response);
+    } catch (error) {
+      console.log("Error fetching cart items:", error.response);
+    }
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
+    localStorage.removeItem("userData");
+    localStorage.removeItem("token");
 
+    setUserdata(null);
+    setToken(null);
+    setAuthModal(false);
+    setAllMedicineInCart([]);
+  };
   const value = {
-    user,
-    loading,
-    login,
+    token,
+    setToken,
+
+    userData,
+    setUserdata,
+
+    authModal,
+    setAuthModal,
+
     logout,
-    isAuthenticated: !!user,
+
+    latitude,
+    setLatitude,
+
+    longitude,
+    setLongitude,
+
+    allmedicineIncart,
+    setAllMedicineInCart,
+
+    getAllMedicineCartItems,
   };
 
   return (

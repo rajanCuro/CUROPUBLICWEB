@@ -4,11 +4,13 @@ import React from "react";
 import { FiSearch, FiUpload } from "react-icons/fi";
 import { HiOutlineFolderOpen } from "react-icons/hi";
 import heroImg from '../../assets/hero.png'
+import MedicinePopularCategories from '../medicine/MedicinePopularCategories'
+import ShopByHealthConcern from "./ShopByHealthConcern";
 
 const MedicineHero = () => {
     return (
 
-        <section className="w-full bg-white py-10 container mx-auto  mt-2">
+        <section className="w-full min-h-screen bg-white py-10 container mx-auto  mt-2 space-y-2">
             <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
                 {/* Left Content */}
                 <div className="flex-1 text-center md:text-left">
@@ -54,8 +56,9 @@ const MedicineHero = () => {
                         className="w-120 object-contain"
                     />
                 </div>
-
             </div>
+            <MedicinePopularCategories />
+            <ShopByHealthConcern />
         </section>
     );
 };
