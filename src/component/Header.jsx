@@ -117,7 +117,7 @@ const Navbar = () => {
             {/* SEARCH BAR */}
             <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full w-56">
               <FiSearch className="text-gray-500 mr-2" />
-              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full" />
+              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full border-0" />
             </div>
 
             {/* CART */}

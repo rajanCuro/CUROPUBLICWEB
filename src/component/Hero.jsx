@@ -27,7 +27,7 @@ const Hero = () => {
                         <input
                             type="text"
                             placeholder="Search medicines, health products..."
-                            className="w-full outline-none text-sm"
+                            className="w-full border-0 outline-none text-sm"
                         />
                     </div>
 
