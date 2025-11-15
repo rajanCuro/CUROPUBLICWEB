@@ -16,14 +16,11 @@ import logo from "../assets/logo.png";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
   const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); // 👉 TRACK CURRENT PATH
+  const location = useLocation(); 
   const id = userData?.id
-
   const profileRef = useRef(null);
-
   const currentPath = location.pathname;
 
   // MENU ITEMS
@@ -115,7 +112,7 @@ const Navbar = () => {
           </div>
 
           {/* RIGHT SECTION */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 gap-4">
 
             {/* SEARCH BAR */}
             <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full w-56">
@@ -124,7 +121,7 @@ const Navbar = () => {
             </div>
 
             {/* CART */}
-            <button onClick={() => navigate('/medicine/cart')} className="relative">
+            <button onClick={() => navigate('/medicine/cart')} className="relative cursor-pointer">
               <FiShoppingCart size={20} className="text-gray-700 hover:text-teal-600" />
               <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs px-1 rounded-full">{allmedicineIncart?.length || 0}</span>
             </button>

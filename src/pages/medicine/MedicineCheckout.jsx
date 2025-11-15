@@ -19,7 +19,7 @@ function MedicineCheckout() {
             {cartData && cartData.length > 0 ? (
                 <div className='flex flex-col lg:flex-row gap-6'>
                     {/* Left Side: Products */}
-                    <div className='bg-white rounded-lg shadow-md p-6 w-2/3'>
+                    <div className='bg-white rounded-md border border-gray-200 p-6 w-full md:w-2/3'>
                         <h2 className='text-xl font-bold mb-4'>Products in Cart</h2>
 
                         {cartData.map((item) => (
@@ -52,17 +52,23 @@ function MedicineCheckout() {
                         ))}
                     </div>
 
-
-
                     {/* Right Side: Order Summary */}
                     <div className='w-full lg:w-1/3 bg-white rounded-lg shadow-md p-5 flex flex-col'>
                         <h2 className='text-xl font-bold mb-4'>Order Summary</h2>
                         <div className='flex flex-col gap-3'>
                             {cartData.map((item) => (
-                                <div key={item.id} className='flex justify-between'>
-                                    <span>{item.medicine?.name} x {item.quantity}</span>
-                                    <span>{formatRupees(item.totalPrice)}</span>
-                                </div>
+                                <>
+                                    <div className='flex flex-row items-center justify-between'>
+                                        <div key={item.id} className='flex flex-col justify-between'>
+                                            <span>{item.medicineBatch.medicine?.name}</span>
+                                            <span>{formatRupees(item.totalPrice)} x {item.quantity}</span>
+                                        </div>
+                                        <div>
+                                            {formatRupees(item.unitPrice * item.quantity)}
+                                        </div>
+
+                                    </div>
+                                </>
                             ))}
                         </div>
                         <hr className='my-4 border-gray-300' />
