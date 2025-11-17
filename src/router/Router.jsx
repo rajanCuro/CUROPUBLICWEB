@@ -13,6 +13,8 @@ import MedicineCheckout from '../pages/medicine/MedicineCheckout'
 import MedicinePaymentMethod from '../pages/medicine/MedicinePaymentMethod'
 import MedicneOrderConfirm from '../pages/medicine/MedicneOrderConfirm'
 import SubCategoryMedicineDetails from '../pages/medicine/SubCategoryMedicineDetails'
+import FamilyMedicalHIstory from '../component/familyMedical/FamilyMedicalHIstoryWrapper'
+import MedicineOrder from '../pages/medicine/MedicineOrder'
 
 function Router() {
   return (
@@ -30,6 +32,8 @@ function Router() {
         <Route path='/medicine/checkout' element={<MedicineCheckout />}/>
         <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />}/>
         <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />}/>
+        <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />}/>
+        <Route path='/medicine/order' element={<MedicineOrder />}/>
 
       </Routes>
     </div>

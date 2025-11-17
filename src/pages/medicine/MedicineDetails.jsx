@@ -1,5 +1,5 @@
 // src/pages/medicine/MedicineDetails.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { PiCurrencyInrBold } from "react-icons/pi";
 import { MdMedicalServices, MdLocalHospital } from "react-icons/md";
@@ -21,6 +21,17 @@ export default function MedicineDetails() {
     const [activeImage, setActiveImage] = useState(
         medicine.medicine?.imagesUrl?.[0] || ""
     );
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+
+        setActiveImage(medicine.medicine?.imagesUrl?.[0] || "");
+    }, [medicine]);
+
+
 
     const handleAddtocart = async (item) => {
         console.log("item", item.id)
@@ -144,7 +155,7 @@ export default function MedicineDetails() {
                         <button
                             onClick={() => handleAddtocart(medicine)}
                             className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition mt-4">
-                            Add to cart
+                            {addingCart ? <span className="loading loading-spinner loading-sm"></span>:"Add to cart"}
                         </button>
                     </div>
                 </div>

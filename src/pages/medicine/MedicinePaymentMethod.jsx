@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../Authorization/AuthContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAddresses } from '../../redux/features/addressSlice';
 import { FaHome, FaPlus } from "react-icons/fa";
 import { FaBuildingColumns } from "react-icons/fa6";
 import axiosInstance from '../../Authorization/axiosInstance';
+import AddNewAddressModal from '../../component/AddNewAddress';
+import { useAuth } from '../../Authorization/AuthContext';
 
 function PaymentMethod({ from }) {
     const { userData, getAllMedicineCartItems } = useAuth();
@@ -20,6 +21,7 @@ function PaymentMethod({ from }) {
     const [selectedPayment, setSelectedPayment] = useState('cod');
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [loading, setLoading] = useState()
+    const [addNewAddressModal, setAddNewAddressModal] = useState(false)
 
     const { addresses } = useSelector((state) => state.address);
 
@@ -53,7 +55,7 @@ function PaymentMethod({ from }) {
     };
 
 
-    const handlePlaceOrder = async () => {       
+    const handlePlaceOrder = async () => {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
@@ -201,7 +203,7 @@ function PaymentMethod({ from }) {
 
                             {/* Add Address Button */}
                             <button
-                                onClick={() => navigate("/add-address")}
+                                onClick={() => setAddNewAddressModal(true)}
                                 className="absolute bottom-0 right-2 cursor-pointer bg-teal-600 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md hover:bg-teal-700"
                             >
                                 <FaPlus className="text-lg" />
@@ -220,11 +222,36 @@ function PaymentMethod({ from }) {
                                 ? "bg-green-600 hover:bg-green-700 cursor-pointer"
                                 : "bg-gray-300 cursor-not-allowed"
                             }`}
-                     >
-                       {loading? <span className="loading loading-spinner loading-sm"></span>: `Place Order ₹${totalAmount}`}
+                    >
+                        {loading ? <span className="loading loading-spinner loading-sm"></span> : `Place Order ₹${totalAmount}`}
                     </button>
                 </div>
             </div>
+
+            {addNewAddressModal &&
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+                    {/* Modal Box */}
+                    <div className='bg-white w-4xl h-[70vh]  rounded-md' >
+                        <div className='flex justify-between   py-2 bg-blue-200 rounded-t-md'>
+                            <p className='pl-2'>Add new Address</p>
+                            <p onClick={() => setAddNewAddressModal(false)} className='cursor-pointer pr-2'>Close</p>
+
+                        </div>
+
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setAddNewAddressModal(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl"
+                        >
+                            ×
+                        </button>
+                        <div className='p-2'>
+                            <AddNewAddressModal onClose={() => setAddNewAddressModal(false)} onSuccess={() => dispatch(fetchAddresses(userId))} />
+                        </div>
+
+                    </div>
+                </div>
+            }
         </div>
     );
 }
