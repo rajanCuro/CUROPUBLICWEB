@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import axiosInstance from "../../Authorization/axiosInstance";
 import MedicineProductBySubCategory from "./MedicineProductBySubCategory";
 import { useAuth } from "../../Authorization/AuthContext";
+import SimilarMedicineProduct from "./SimilarMedicineProduct";
 
 function MedicneSubcategoryProduct() {
     const { id } = useParams(); // category ID
@@ -22,7 +23,7 @@ function MedicneSubcategoryProduct() {
     // Fetch categories on mount
     useEffect(() => {
         if (id) fetchSubcategories();
-        window.scrollTo(0,0)
+        window.scrollTo(0, 0)
     }, [id]);
 
     // 👉 Fetch products by selected subcategory
@@ -63,7 +64,7 @@ function MedicneSubcategoryProduct() {
     };
 
     return (
-        <div className="w-full md:container mx-auto">
+        <div className="w-full md:container mx-auto mb-2">
             {/* Loading */}
             {loading && <p className="text-gray-500">Loading...</p>}
 
@@ -83,11 +84,10 @@ function MedicneSubcategoryProduct() {
                         <div
                             key={item.subCatid}
                             onClick={() => getProductBySubCategory(item, index)}
-                            className={`border rounded-md p-3 flex flex-col items-center cursor-pointer transition ${
-                                activeIndex === index
-                                    ? "bg-green-100 border-green-500 shadow-md"
-                                    : "bg-white border-gray-200 hover:shadow-md"
-                            }`}
+                            className={`border rounded-md p-3 flex flex-col items-center cursor-pointer transition ${activeIndex === index
+                                ? "bg-green-100 border-green-500 shadow-md"
+                                : "bg-white border-gray-200 hover:shadow-md"
+                                }`}
                         >
                             <img
                                 src={item.imageUrl}
@@ -98,7 +98,7 @@ function MedicneSubcategoryProduct() {
                             <p className="mt-2 text-center text-xs md:text-sm md:font-medium">
                                 {window.innerWidth < 640
                                     ? item.subCatname.slice(0, 10) +
-                                      (item.subCatname.length > 10 ? "..." : "")
+                                    (item.subCatname.length > 10 ? "..." : "")
                                     : item.subCatname}
                             </p>
                         </div>
@@ -113,6 +113,8 @@ function MedicneSubcategoryProduct() {
             {!loading && subcategories.length === 0 && (
                 <p className="text-gray-500 mt-4">No subcategories found.</p>
             )}
+            <SimilarMedicineProduct name={subCatName ?? "Headache"} />
+
         </div>
     );
 }

@@ -3,12 +3,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdLocalPharmacy } from "react-icons/md";
 import { BiTestTube } from "react-icons/bi";
-import { FaUserMd } from "react-icons/fa";
-import { FaAmbulance } from "react-icons/fa";
+import { FaUserMd, FaAmbulance, FaUserCircle } from "react-icons/fa";
 import { HiHome, HiOutlineLocationMarker } from "react-icons/hi";
 import { useAuth } from "../Authorization/AuthContext";
 import Swal from "sweetalert2";
-import { FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
 import logo from "../assets/logo.png";
@@ -18,12 +16,11 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); 
-  const id = userData?.id
+  const location = useLocation();
+  const id = userData?.id;
   const profileRef = useRef(null);
   const currentPath = location.pathname;
 
-  // MENU ITEMS
   const menu = [
     { name: "Pharmacy", path: "/medicine/delivery", icon: <MdLocalPharmacy size={18} /> },
     { name: "Lab", path: "/lab", icon: <BiTestTube size={18} /> },
@@ -32,7 +29,7 @@ const Navbar = () => {
     { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} /> },
   ];
 
-  // CLICK OUTSIDE PROFILE DROPDOWN
+  // CLICK OUTSIDE PROFILE CLOSE
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -42,7 +39,6 @@ const Navbar = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
 
-    // ✅ run async function correctly
     const fetchCart = async () => {
       await getAllMedicineCartItems(id);
     };
@@ -52,7 +48,6 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const handleLogout = () => {
     Swal.fire({
@@ -73,8 +68,14 @@ const Navbar = () => {
     });
   };
 
+  // CLOSE PROFILE WHEN CLICKING MENU ITEMS
+  const handleProfileMenuClick = (action) => {
+    setProfileOpen(false); // <-- FIX: closes submenu on click
+    action();
+  };
+
   return (
-    <nav className="  bg-white shadow-sm sticky top-0 z-50">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* MAIN NAV */}
@@ -87,7 +88,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* ===== DESKTOP MENU ===== */}
+          {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center space-x-6 text-gray-700 text-sm font-medium">
 
             {menu.map((item) => (
@@ -117,13 +118,15 @@ const Navbar = () => {
             {/* SEARCH BAR */}
             <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full w-56">
               <FiSearch className="text-gray-500 mr-2" />
-              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full border-0" />
+              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full" />
             </div>
 
             {/* CART */}
             <button onClick={() => navigate('/medicine/cart')} className="relative cursor-pointer">
               <FiShoppingCart size={20} className="text-gray-700 hover:text-teal-600" />
-              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs px-1 rounded-full">{allmedicineIncart?.length || 0}</span>
+              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs px-1 rounded-full">
+                {allmedicineIncart?.length || 0}
+              </span>
             </button>
 
             {/* PROFILE */}
@@ -138,8 +141,27 @@ const Navbar = () => {
 
                 {profileOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md py-2 border z-50">
-                    <button onClick={() => navigate("/profile")} className="w-full text-left px-4 py-2 hover:bg-gray-100">Profile</button>
-                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Logout</button>
+
+                    <button
+                      onClick={() => handleProfileMenuClick(() => navigate("/profile"))}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Profile
+                    </button>
+
+                    <button
+                      onClick={() => handleProfileMenuClick(() => navigate("/medicine/order"))}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      My Orders
+                    </button>
+
+                    <button
+                      onClick={() => handleProfileMenuClick(handleLogout)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                    >
+                      Logout
+                    </button>
                   </div>
                 )}
               </div>
@@ -159,7 +181,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ===== MOBILE MENU ===== */}
+      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 px-4 pb-4 space-y-3 text-gray-700 text-sm">
 
@@ -172,9 +194,7 @@ const Navbar = () => {
                 hover:text-teal-600 
                 ${currentPath === item.path ? "text-teal-600 font-semibold" : ""}`}
             >
-              <span className={`${currentPath === item.path ? "text-teal-600" : ""}`}>
-                {item.icon}
-              </span>
+              <span>{item.icon}</span>
               <span>{item.name}</span>
             </Link>
           ))}

@@ -37,7 +37,7 @@ function MedicineProductBySubCategory({ productList = [] }) {
                     }
                     key={index}
                     className="flex items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm"
-                >
+                 >
                     {/* Image */}
                     <div className="w-20 h-20 md:w-28 md:h-28 ">
                         <img

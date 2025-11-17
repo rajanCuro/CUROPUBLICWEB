@@ -2,7 +2,7 @@
 import React from "react";
 import { FiSearch, FiUpload } from "react-icons/fi";
 import { HiOutlineFolderOpen } from "react-icons/hi";
-import heroImg from '../assets/hero.png'
+import heroImg from '../assets/doctor/doc.png'
 
 const Hero = () => {
     return (

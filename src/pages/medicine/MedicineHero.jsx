@@ -30,7 +30,7 @@ const MedicineHero = () => {
                         <input
                             type="text"
                             placeholder="Search medicines, health products..."
-                            className="w-full outline-none text-sm"
+                            className="w-full outline-none text-sm border-0"
                         />
                     </div>
 
