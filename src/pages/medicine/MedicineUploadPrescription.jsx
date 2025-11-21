@@ -4,6 +4,8 @@ import { IoClose } from "react-icons/io5";
 import { FiCamera, FiUpload, FiUser, FiUsers } from "react-icons/fi";
 import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
+import { useStomp } from "../../notification/StompSocket";
+import { useNavigate } from "react-router-dom";
 
 const MedicineUploadPrescription = ({ onClose, mode }) => {
     const { userData, latitude, longitude, token, setAuthModal } = useAuth();
@@ -19,7 +21,11 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
     const [selectedFamily, setSelectedFamily] = useState(null);
 
     const fileInputRef = useRef(null);
+    const { connected, subscribe, publish } = useStomp()
+    const [subscription, setSubscription] = useState(null);
+    const [recentAcceptedPrescriptionId, setRecentAcceptedPrescriptionId] = useState(localStorage.getItem("recentAcceptedPrescriptionId"));
 
+    const navigate=useNavigate();
     // -------------------------
     // Fetch Family Members
     // -------------------------
@@ -146,9 +152,9 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
                     },
                 }
             );
-
-            console.log("Upload successful:", res);
-
+            localStorage.setItem("recentUplaodedPrescriptionIs", res.data.response.id)
+            navigate("/prescription-waiting")
+            // handleSubscribe(`/topic/prescription-accept-${res.data.response.id}`)
             // Success handling
             setTimeout(() => {
                 setFile(null);
@@ -177,6 +183,34 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
             return "📄";
         }
         return "🖼️";
+    };
+
+    const handleSubscribe = (endpoint) => {
+        if (!connected) {
+            console.warn('⚠️ Not connected yet.');
+            return;
+        }
+
+        if (subscription) {
+            console.log('🔁 Already subscribed, unsubscribing previous one...');
+            subscription.unsubscribe();
+        }
+
+        console.log(`📡 Subscribing to: ${endpoint}`);
+        const sub = subscribe(endpoint, async (msg) => {
+            console.log(`💬 Message from ${endpoint}:`, msg);
+            // console.log(body)
+            localStorage.setItem("recentAcceptedPrescriptionId",msg.prescriptionId)
+            setRecentAcceptedPrescriptionId(msg.prescriptionId)
+            Alert.alert(
+                '🔔 New Notification',
+                msg.message,
+                [{ text: 'OK', style: 'default' }],
+                { cancelable: true }
+            );
+        });
+        setSubscription(sub);
+
     };
 
     return (

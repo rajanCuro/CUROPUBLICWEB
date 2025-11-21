@@ -20,33 +20,39 @@ import ManageProfile from '../component/profile/ManageProfile'
 import MedicineTrackorder from '../pages/medicine/MedicineTrackorder'
 import DoctorRouting from './DoctorRouting'
 import AmbulanceRouting from './AmbulanceRouting'
+import { StompProvider } from '../notification/StompSocket'
+import PrescriptionWaiting from '../component/PrescriptionWaiting'
 
 function Router() {
   return (
-    <div>
-      <Routes>
-        <Route path='/' element={<LandingPage />} />
-        <Route path='/medicine/delivery' element={<MedicineHome />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/profile' element={<MyProfile />} />
-        <Route path='/manage_profile' element={<ManageProfile />} />
-        <Route path='/medicine/category/subcategory/product/:id' element={<MedicneSUbcategoryProduct />} />
-        <Route path='/medicine/cart' element={<MedicineCartItems />} />
-        <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />} />
-        <Route path='/medicine/shopbyhealthconcern/medicine_details' element={<MedicineDetails />} />
-        <Route path='/medicine/subCategory/medicine_details' element={<SubCategoryMedicineDetails />} />
-        <Route path='/medicine/checkout' element={<MedicineCheckout />} />
-        <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />} />
-        <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />} />
-        <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
-        <Route path='/medicine/order' element={<MedicineOrder />} />
-        <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
+    <StompProvider>
+      <div>
+        <Routes>
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/medicine/delivery' element={<MedicineHome />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/profile' element={<MyProfile />} />
+          <Route path='/manage_profile' element={<ManageProfile />} />
+          <Route path='/medicine/category/subcategory/product/:id' element={<MedicneSUbcategoryProduct />} />
+          <Route path='/medicine/cart' element={<MedicineCartItems />} />
+          <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />} />
+          <Route path='/medicine/shopbyhealthconcern/medicine_details' element={<MedicineDetails />} />
+          <Route path='/medicine/subCategory/medicine_details' element={<SubCategoryMedicineDetails />} />
+          <Route path='/medicine/checkout' element={<MedicineCheckout />} />
+          <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />} />
+          <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />} />
+          <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
+          <Route path='/medicine/order' element={<MedicineOrder />} />
+          <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
+          <Route path='/prescription-waiting' element={<PrescriptionWaiting/>}/>
+          <Route path='/medicine/payment/:prescription' element={<MedicinePaymentMethod/>}/>
 
-      </Routes>
-      <LabRouting />
-      <DoctorRouting />
-      <AmbulanceRouting />
-    </div>
+        </Routes>
+        <LabRouting />
+        <DoctorRouting />
+        <AmbulanceRouting />
+      </div>
+    </StompProvider>
   )
 }
 
