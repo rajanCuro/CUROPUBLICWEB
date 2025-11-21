@@ -1,18 +1,14 @@
 # STEP 1: Build React app
 FROM node:20 as build
 
-WORKDIR /app
+WORKDIR /react-vite-app
 
-COPY package*.json ./
-RUN npm install
+EXPOSE 3000
 
-COPY . .
-RUN npm run build
+COPY package.json package-lock.json ./
 
-# STEP 2: NGINX to serve production build
-FROM nginx:alpine
+RUN npm install --silent
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY . ./
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev"]
