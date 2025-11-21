@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Swal from "sweetalert2";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAddresses } from '../../redux/features/addressSlice';
 import { FaHome, FaPlus } from "react-icons/fa";
@@ -11,7 +11,7 @@ import axiosInstance from '../../Authorization/axiosInstance';
 import AddNewAddressModal from '../../component/AddNewAddress';
 import { useAuth } from '../../Authorization/AuthContext';
 
-function PaymentMethod({ from }) {
+function PaymentMethod() {
     const { userData, getAllMedicineCartItems } = useAuth();
     const userId = userData?.id;
     const dispatch = useDispatch();
@@ -22,9 +22,8 @@ function PaymentMethod({ from }) {
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [loading, setLoading] = useState()
     const [addNewAddressModal, setAddNewAddressModal] = useState(false)
-
+    const from = useParams()
     const { addresses } = useSelector((state) => state.address);
-
     // MOBILE TABS
     const [activeTab, setActiveTab] = useState("payment");
 
@@ -59,9 +58,11 @@ function PaymentMethod({ from }) {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
-                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from || ""}`
+                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from.prescription || ""}`
             );
-            console.log("order", response);
+            localStorage.removeItem("recentAcceptedPrescriptionId")
+            localStorage.removeItem("recentUplaodedPrescriptionIs")
+
             navigate('/medicine/checkout/order-confirm', { state: { payment: selectedPayment, totalAmount, cartData } })
             setLoading(false)
             await getAllMedicineCartItems(userId);
