@@ -6,7 +6,7 @@ import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 
 const MedicineUploadPrescription = ({ onClose, mode }) => {
-    const { userData, latitude, longitude } = useAuth();
+    const { userData, latitude, longitude, token, setAuthModal } = useAuth();
     const userId = userData?.id;
 
     const [file, setFile] = useState(null);
@@ -51,9 +51,19 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
         }
     };
 
-    const openGallery = () => fileInputRef.current?.click();
+    const openGallery = () => {
+        if (!token) {
+            // If user not logged in → open modal
+            setAuthModal(true);
+            return;
+        }
+
+        // If logged in → open gallery
+        fileInputRef.current?.click();
+    };
 
     const handleDragOver = (e) => {
+
         e.preventDefault();
         e.currentTarget.classList.add("border-blue-500", "bg-blue-50");
     };
@@ -66,9 +76,19 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
     };
 
     const handleDrop = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // 🛑 Stop browser from opening the file
+        e.stopPropagation(); // (optional) extra safety
+
+        // Remove highlight effects
         e.currentTarget.classList.remove("border-blue-500", "bg-blue-50");
 
+        // If user NOT logged in → open modal and stop
+        if (!token) {
+            setAuthModal(true);
+            return;
+        }
+
+        // Validate file
         const droppedFile = e.dataTransfer.files[0];
         if (droppedFile && (droppedFile.type.startsWith('image/') || droppedFile.type === 'application/pdf')) {
             setFile(droppedFile);
@@ -76,6 +96,7 @@ const MedicineUploadPrescription = ({ onClose, mode }) => {
             alert("Please upload only images or PDF files");
         }
     };
+
 
     // -------------------------
     // Main Upload Method

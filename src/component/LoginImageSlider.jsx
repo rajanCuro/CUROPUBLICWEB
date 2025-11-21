@@ -1,21 +1,25 @@
+// src/component/LoginImageSlider.jsx
 import React, { useEffect, useState } from "react";
+import l1 from '../assets/login/l1.png'
+import l2 from '../assets/login/l2.png'
+import l3 from '../assets/login/l3.png'
 
 const slides = [
   {
     id: 1,
-    img: "https://img.freepik.com/free-vector/access-control-system-abstract-concept_335657-3180.jpg?semt=ais_hybrid&w=740&q=80",
+    img: l1,
     title: "Fast & Secure Login",
     desc: "Access your account with complete safety.",
   },
   {
     id: 2,
-    img: "https://via.placeholder.com/600x400?text=Slide+2",
+    img: l2,
     title: "Track Your Orders",
     desc: "Stay updated with real-time order status.",
   },
   {
     id: 3,
-    img: "https://via.placeholder.com/600x400?text=Slide+3",
+    img: l3,
     title: "Best Offers Everyday",
     desc: "Enjoy amazing deals and discounts.",
   },
@@ -33,7 +37,7 @@ function LoginImageSlider() {
   }, []);
 
   return (
-    <div className="relative w-full h-[350px] overflow-hidden rounded-xl shadow-lg">
+    <div className="relative w-full h-[350px] overflow-hidden ">
 
       {slides.map((slide, i) => (
         <div
@@ -50,7 +54,7 @@ function LoginImageSlider() {
           />
 
           {/* Text Overlay */}
-          <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-center px-4">
+          <div className="absolute flex flex-col justify-center items-center text-center px-4">
             <h2 className="text-white text-2xl font-bold mb-2">
               {slide.title}
             </h2>
