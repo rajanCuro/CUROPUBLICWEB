@@ -13,7 +13,6 @@ function MedicineCartItems() {
     const navigate = useNavigate();
     const { userData, getAllMedicineCartItems } = useAuth();
     const [handlingChareg, setHandlingChareg] = useState(12)
-
     const [cartData, setCartData] = useState([]);
     const [loading, setLoading] = useState(true);
     const id = userData?.id

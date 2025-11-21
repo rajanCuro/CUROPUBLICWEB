@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './Authorization/AuthContext.jsx'
+import {LabAuthProvider} from './Authorization/LabAuthContext.jsx'
 import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 import { ToastContainer } from 'react-toastify'
@@ -14,10 +15,12 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <AuthProvider>
-          <ToastContainer />
-          <App />
-        </AuthProvider>
+        <LabAuthProvider>
+          <AuthProvider>
+            <ToastContainer />
+            <App />
+          </AuthProvider>
+        </LabAuthProvider>
       </BrowserRouter>
     </Provider>
   </StrictMode>,

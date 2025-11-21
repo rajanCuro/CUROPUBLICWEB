@@ -1,3 +1,4 @@
+// src/pages/lab/labhome/LabUploadPrescription.jsx
 // src/pages/medicine/LabUploadPrescription.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { IoClose } from "react-icons/io5";

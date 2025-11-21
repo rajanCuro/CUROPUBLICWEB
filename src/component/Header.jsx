@@ -10,6 +10,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
 import logo from "../assets/logo.png";
 import { useAuth } from "../Authorization/AuthContext";
+import { useLabAuth } from "../Authorization/LabAuthContext";
 const placeholders = [
   "Search for medicine",
   "Search for pain relief",
@@ -22,11 +23,13 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
+  const { screen, setScreen, getAllCartItems ,labCartItems } = useLabAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const id = userData?.id;
   const profileRef = useRef(null);
   const currentPath = location.pathname;
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,10 +41,14 @@ const Navbar = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    getAllCartItems()
+  }, [])
+
   const menu = [
+    { name: "Home", path: "/", icon: <HiHome size={18} /> },
     { name: "Pharmacy", path: "/medicine/delivery", icon: <MdLocalPharmacy size={18} /> },
     { name: "Lab", path: "/lab", icon: <BiTestTube size={18} /> },
-    { name: "Home", path: "/", icon: <HiHome size={18} /> },
     { name: "Doctor", path: "/doctor", icon: <FaUserMd size={18} /> },
     { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} /> },
   ];
@@ -137,12 +144,22 @@ const Navbar = () => {
             </div>
 
             {/* CART */}
-            <button onClick={() => navigate('/medicine/cart')} className="relative cursor-pointer">
+            {screen == "Pharmacy" ? <button onClick={() => navigate('/medicine/cart')} className="relative cursor-pointer">
               <FiShoppingCart size={24} className="text-gray-700 hover:text-teal-600" />
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {allmedicineIncart?.length || 0}
               </span>
             </button>
+              :
+              <button onClick={() => navigate('/lab_cartitems')} className="relative cursor-pointer">
+                <FiShoppingCart size={24} className="text-gray-700 hover:text-teal-600" />
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {labCartItems?.length || 0}
+                </span>
+              </button>
+            }
+
+
 
             {/* PROFILE ICON */}
             {token ? (

@@ -11,19 +11,19 @@ import ShopByHealthConcern from "./ShopByHealthConcern";
 import MedicineUploadPrescription from "./MedicineUploadPrescription";
 import { useNavigate } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
+import { useLabAuth } from "../../Authorization/LabAuthContext";
 
 const MedicineHero = () => {
     const navigate = useNavigate();
     const sliderImages = [heroImg, sl1, sl2];
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false);
     const [uploadMode, setUploadMode] = useState("normal");
-
     const [searchText, setSearchText] = useState("");
     const [searchHistory, setSearchHistory] = useState([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const { screen, setScreen } = useLabAuth()
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -31,6 +31,10 @@ const MedicineHero = () => {
         }, 3000); // 3 seconds
         return () => clearInterval(interval);
     }, [currentIndex]);
+
+    useEffect(() => {
+        setScreen('Pharmacy')
+    }, [setScreen])
 
     // Smooth slide transition
     const handleNextSlide = () => {
@@ -218,8 +222,8 @@ const MedicineHero = () => {
                             <div
                                 key={index}
                                 className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${index === currentIndex
-                                        ? "opacity-100 scale-100"
-                                        : "opacity-0 scale-105"
+                                    ? "opacity-100 scale-100"
+                                    : "opacity-0 scale-105"
                                     }`}
                             >
                                 <img
@@ -238,8 +242,8 @@ const MedicineHero = () => {
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
                                 className={`w-3 h-3 rounded-full cursor-pointer transition-all ${index === currentIndex
-                                        ? "bg-white scale-125"
-                                        : "bg-white/50"
+                                    ? "bg-white scale-125"
+                                    : "bg-white/50"
                                     }`}
                             />
                         ))}

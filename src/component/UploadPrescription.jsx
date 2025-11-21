@@ -17,7 +17,7 @@ function UploadPrescription() {
     }
 
     return (
-        <div className="w-full ">
+        <div className="w-full container mx-auto ">
             <div className="w-full bg-gray-50  sm:py-8 md:py-10 rounded-md shadow-md py-4 ">
 
                 <div className="flex flex-col items-center justify-center text-center px-4">

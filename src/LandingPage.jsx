@@ -5,14 +5,15 @@ import UploadPrescription from './component/UploadPrescription'
 import OurServices from './component/OurServices'
 import UpcommingStaus from './component/UpcommingStaus'
 import HealthRecords from './component/HealthRecords'
+import Testimonial from './component/Testomonial'
 
 function LandingPage() {
     return (
-        <div className="w-full   container mx-auto">
+        <div className="w-full    mx-auto">
             {/* Main Container */}
             <div className=" mx-auto ">
                 {/* Hero Section */}
-                <section className="py-2 sm:py-10 ">
+                <section className="">
                     <Hero />
                 </section>
 
@@ -34,6 +35,9 @@ function LandingPage() {
                 {/* Health Records */}
                 <section className="py-2 sm:py-10 ">
                     <HealthRecords />
+                </section>
+                <section className="py-2 sm:py-10 ">
+                    <Testimonial/>
                 </section>
             </div>
         </div>

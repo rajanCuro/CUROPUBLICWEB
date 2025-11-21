@@ -3,15 +3,24 @@ import React from 'react'
 import { FaHandHoldingHeart } from "react-icons/fa";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../Authorization/AuthContext';
 
 
 
 function HealthRecords() {
+    const { token, setAuthModal } = useAuth()
     const navigate = useNavigate()
+    const handleNvaigateFamilyHistory = () => {
+        if (!token) {
+            setAuthModal(true)
+            return;
+        }
+        navigate('/familyMedical_history')
+    }
     return (
         <>
             <div
-                onClick={() => navigate('/familyMedical_history')}
+                onClick={() => handleNvaigateFamilyHistory()}
                 className='container bg-white mx-auto shadow-md rounded-md  p-6'>
                 <div className='flex flex-row justify-between items-center'>
                     <div className='flex flex-row justify-start items-center gap-10'>

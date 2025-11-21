@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/pages/lab/labhome/LabHero.jsx
+import React, { useState, useEffect, use } from "react";
 import { FiSearch, FiUpload } from "react-icons/fi";
 import { HiOutlineFolderOpen } from "react-icons/hi";
 import heroImg from "../../../assets/lab/lab1.png";
@@ -7,19 +8,19 @@ import sl2 from '../../../assets/lab/lab3.png';
 import { useNavigate } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
 import MedicineUploadPrescription from "../../medicine/MedicineUploadPrescription";
+import LabUploadPrescription from "./LabUploadPrescription";
+import { useLabAuth } from "../../../Authorization/LabAuthContext";
 
 const LabHero = () => {
     const navigate = useNavigate();
     const sliderImages = [heroImg, sl1, sl2];
-
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false);
     const [uploadMode, setUploadMode] = useState("normal");
-
     const [searchText, setSearchText] = useState("");
     const [searchHistory, setSearchHistory] = useState([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-
     const [currentIndex, setCurrentIndex] = useState(0);
+    const { screen, setScreen } = useLabAuth()
 
     // Auto Slider
     useEffect(() => {
@@ -31,6 +32,9 @@ const LabHero = () => {
 
         return () => clearInterval(interval);
     }, []);
+    useEffect(() => {
+        setScreen('Lab')
+    }, [screen])
 
     // Load search history
     useEffect(() => {
@@ -178,8 +182,8 @@ const LabHero = () => {
                             <div
                                 key={index}
                                 className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${index === currentIndex
-                                        ? "opacity-100 scale-100"
-                                        : "opacity-0 scale-105"
+                                    ? "opacity-100 scale-100"
+                                    : "opacity-0 scale-105"
                                     }`}
                             >
                                 <img
@@ -198,8 +202,8 @@ const LabHero = () => {
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
                                 className={`w-3 h-3 rounded-full cursor-pointer transition-all ${index === currentIndex
-                                        ? "bg-white scale-125"
-                                        : "bg-white/50"
+                                    ? "bg-white scale-125"
+                                    : "bg-white/50"
                                     }`}
                             />
                         ))}
@@ -219,7 +223,7 @@ const LabHero = () => {
                             ×
                         </button>
 
-                        <MedicineUploadPrescription
+                        <LabUploadPrescription
                             mode={uploadMode}
                             onClose={() => setUploadPrescriptionModal(false)}
                         />

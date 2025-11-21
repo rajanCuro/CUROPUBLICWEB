@@ -7,7 +7,7 @@ import { useAuth } from "../../Authorization/AuthContext";
 
 
 const AddNewFamily = ({ onClose, onSuccess, existingMember }) => {
-    const { userData } = useAuth();
+    const { userData,token } = useAuth();
     const [customRelationship, setCustomRelationship] = useState("");
     const [familyMember, setFamilyMember] = useState({
         name: "",

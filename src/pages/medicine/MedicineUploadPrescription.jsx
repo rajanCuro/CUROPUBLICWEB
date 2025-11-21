@@ -7,7 +7,7 @@ import axiosInstance from "../../Authorization/axiosInstance";
 import { useStomp } from "../../notification/StompSocket";
 import { useNavigate } from "react-router-dom";
 
-const MedicineUploadPrescription = ({ onClose, mode }) => {
+const MedicineUploadPrescription = ({ onClose, mode ,from }) => {
     const { userData, latitude, longitude, token, setAuthModal } = useAuth();
     const userId = userData?.id;
 

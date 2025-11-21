@@ -1,3 +1,4 @@
+// src/pages/medicine/PrescriptionMedicineCart.jsx
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
@@ -8,6 +9,7 @@ function PrescriptionMedicineCart() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { userData } = useAuth();
+    const [handlingChareg, setHandlingChareg] = useState(12)
     const navigate = useNavigate()
 
     // Fetch cart items added by pharmacist
