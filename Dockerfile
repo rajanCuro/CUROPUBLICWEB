@@ -1,13 +1,18 @@
-FROM node:18-alpine
+# STEP 1: Build React app
+FROM node:20 as build
 
-WORKDIR /react-vite-app
+WORKDIR /app
 
-EXPOSE 3000
+COPY package*.json ./
+RUN npm install
 
-COPY package.json package-lock.json ./
+COPY . .
+RUN npm run build
 
-RUN npm install --silent
+# STEP 2: NGINX to serve production build
+FROM nginx:alpine
 
-COPY . ./
+COPY --from=build /app/dist /usr/share/nginx/html
 
-CMD ["npm", "run", "dev"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
