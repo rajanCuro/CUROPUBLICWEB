@@ -11,9 +11,12 @@ export default defineConfig({
     'global': 'globalThis'
   },
   server: {
-    port: 3000,          // fixed port
+    port: 3000,            // fixed port
     strictPort: true,   // do not switch to another port if 300 is in use
-    host: true,         // allows access from network (optional)
+    host: true,           // allows access from network (optional)
   },
+  allowedHosts: [
+      'curo24.com', 'www.curo24.com' // Add your host here
+    ],
   
 })
