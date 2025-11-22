@@ -31,13 +31,14 @@ function MedicinePopularCategories() {
         <div className="">
 
             {/* Title */}
-            <h2 className="text-xl font-semibold mb-4">Popular Categories</h2>
+            <h2 className="md:text-3xl text-xl font-bold text-gray-800 mb-8 text-start">
+                Popular Categories</h2>
 
             {loading && <p className="text-gray-500">Loading categories...</p>}
             {error && <p className="text-red-600">{error}</p>}
 
             {/* ✅ FIXED: Map the list */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 ">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 ">
                 {categoryList.map((item) => (
                     <div
                         key={item.id}

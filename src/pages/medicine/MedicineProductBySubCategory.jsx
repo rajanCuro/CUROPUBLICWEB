@@ -35,8 +35,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
 
     return (
 
-        <div className="flex flex-wrap justify-start items-start gap-2 mx-2">
-          
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mx-2">
             {productList.map((item, index) => (
                 <div
                     key={index}
@@ -45,10 +44,10 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                             state: { medicineList: item },
                         })
                     }
-                    className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl w-32 md:w-40 h-70 cursor-pointer hover:shadow-md transition"
+                    className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl h-70 cursor-pointer hover:shadow-md transition"
                 >
                     <img
-                        className="w-full h-24 rounded-t-xl object-contain"
+                        className="w-full md:h-24 h-16 rounded-t-xl object-contain"
                         src={item?.pharmacyMedicineBatch?.medicine?.image || defaultImageURL}
                         alt={item?.pharmacyMedicineBatch?.medicine?.name || "Medicine"}
                     />
@@ -79,7 +78,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                                 e.stopPropagation();
                                 handleAddtocart(item);
                             }}
-                            className="mt-2 bg-green-500 text-white px-4 py-1 rounded-md hover:bg-green-600 transition"
+                            className="mt-2 bg-green-500 text-white px-2 md:px-4 py-1 rounded-md hover:bg-green-600 transition text-xs md:text-md"
                         >
                             {addingCartId === item?.pharmacyMedicineBatch?.id ? (
                                 <span className="loading loading-spinner loading-sm"></span>
@@ -91,6 +90,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                 </div>
             ))}
         </div>
+
     );
 }
 

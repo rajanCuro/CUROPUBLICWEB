@@ -112,7 +112,7 @@ function MedicineOrder() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto hide-scrollbar">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -195,8 +195,7 @@ function MedicineOrder() {
       {/* Enhanced Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            {console.log("selcet", selectedOrder)}
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden hide-scrollbar">            
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
               <div className="flex justify-between items-center">

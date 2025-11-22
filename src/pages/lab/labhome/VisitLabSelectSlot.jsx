@@ -1,11 +1,11 @@
-// src/pages/lab/labhome/SelectSlot.jsx
+// src/pages/lab/labhome/VisitLabSelectSlot.jsx
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 
-function SelectSlot({ labCartItems }) {
+function VisitLabSelectSlot({ labCartItems }) {
     const { userData, getAllLabCartItems } = useLabAuth();
     const userId = userData?.id;
     const navigate = useNavigate();
@@ -15,7 +15,6 @@ function SelectSlot({ labCartItems }) {
 
     const [slots, setSlots] = useState([]);
     const [familyMembers, setFamilyMembers] = useState([]);
-    const [addresses, setAddresses] = useState([]);
 
     const [activePackage, setActivePackage] = useState(null);
     const [activeStep, setActiveStep] = useState(null);
@@ -49,21 +48,8 @@ function SelectSlot({ labCartItems }) {
         }
     };
 
-    const fetchAddress = async () => {
-        try {
-            const res = await axiosInstance.get(
-                `/endUserAddress/getAddressByUserId/${userData?.id}`
-            );
-            setAddresses(res.data?.dto || res.data || []);
-        } catch (err) {
-            console.error("fetchAddress:", err);
-            setAddresses([]);
-        }
-    };
-
     useEffect(() => {
         fetchFamilyMembers();
-        fetchAddress();
     }, []);
 
     useEffect(() => {
@@ -137,37 +123,32 @@ function SelectSlot({ labCartItems }) {
     const onSelectFamily = (fm) => {
         updateSelectionForActivePackage({
             patientId: String(fm.id),
-            patientName: fm.name
+            patientName: fm.name,
+            // Set address ID to null and skip address selection
+            selectedAddressId: null,
+            addressName: "Not Required"
         });
-        setActiveStep("address");
-    };
-
-    const onSelectAddress = (ad) => {
-        updateSelectionForActivePackage({
-            selectedAddressId: String(ad.id),
-            addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
-        });
+        // Skip address step and complete the selection
         setActivePackage(null);
         setActiveStep(null);
     };
 
     const handleCheckout = async () => {
         setLoading(true);
-        // Only include selections that have all required IDs
+        // Only include selections that have all required IDs (addressId is now null)
         const order = Object.values(selections)
             .filter(
                 s =>
                     s &&
                     s.appointmentDate &&
                     s.selectedSlotId &&
-                    s.selectedAddressId &&
                     s.selectedPackageId &&
                     s.patientId
+                    // Removed address validation since it's now null
             )
             .map(s => ({
                 appointmentDate: s.appointmentDate,
-                selectedSlotId: s.selectedSlotId,
-                selectedAddressId: s.selectedAddressId,
+                selectedSlotId: s.selectedSlotId,              
                 selectedPackageId: s.selectedPackageId,
                 patientId: s.patientId
             }));
@@ -183,10 +164,8 @@ function SelectSlot({ labCartItems }) {
             console.log("Order response:", response.data);
             await getAllLabCartItems()
             navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
-
-            // navigate('/lab/appointment/confirm');
         } catch (error) {
-            console.error("Order error:", error.response?.data || error.message);
+            console.error("Order error:", error);
             // You might want to add error notification here
         } finally {
             setLoading(false);
@@ -199,9 +178,9 @@ function SelectSlot({ labCartItems }) {
             s &&
             s.appointmentDate &&
             s.selectedSlotId &&
-            s.selectedAddressId &&
             s.selectedPackageId &&
             s.patientId
+            // Removed address validation
         );
     };
 
@@ -210,7 +189,6 @@ function SelectSlot({ labCartItems }) {
         if (!s) return null;
         const slotName = s.slotStartAt && s.slotEndAt ? `${s.slotStartAt} - ${s.slotEndAt}` : "N/A";
         const patientName = s.patientName || "N/A";
-        const addressName = s.addressName || "N/A";
 
         return (
             <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
@@ -218,7 +196,7 @@ function SelectSlot({ labCartItems }) {
                     <div className="w-2 h-2 bg-green-600 rounded-full"></div>
                     <span className="text-sm font-medium text-gray-700">All details selected</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="flex flex-col">
                         <span className="text-xs font-medium text-gray-500 mb-1">Date</span>
                         <span className="text-sm font-semibold text-gray-900">{s.appointmentDate}</span>
@@ -231,10 +209,6 @@ function SelectSlot({ labCartItems }) {
                         <span className="text-xs font-medium text-gray-500 mb-1">Patient</span>
                         <span className="text-sm font-semibold text-gray-900">{patientName}</span>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 mb-1">Address</span>
-                        <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>{addressName}</span>
-                    </div>
                 </div>
             </div>
         );
@@ -243,22 +217,22 @@ function SelectSlot({ labCartItems }) {
     const renderStepIndicator = () => {
         const steps = [
             { key: "slots", label: "Select Slot", icon: "🕒" },
-            { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
-            { key: "address", label: "Select Address", icon: "📍" }
+            { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" }
+            // Removed address step
         ];
 
         const currentIndex = steps.findIndex(step => step.key === activeStep);
 
         return (
             <div className="mb-8">
-                <div className="flex items-center justify-between max-w-2xl mx-auto">
+                <div className="flex items-center justify-between max-w-md mx-auto">
                     {steps.map((step, index) => (
                         <React.Fragment key={step.key}>
                             <div className="flex flex-col items-center">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-medium transition-all duration-300 ${index < currentIndex
                                     ? "bg-green-600 text-white"
                                     : index === currentIndex
-                                        ? "bg-blue-600 text-white ring-2 ring-blue-200"
+                                        ? "bg-teal-600 text-white ring-2 ring-teal-200"
                                         : "bg-gray-100 text-gray-400 border border-gray-300"
                                     }`}>
                                     {index < currentIndex ? "✓" : step.icon}
@@ -294,7 +268,7 @@ function SelectSlot({ labCartItems }) {
                         Schedule Lab Tests
                     </h1>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        Select time slots and details for your lab packages
+                        Select time slots and patient details for your lab packages
                     </p>
                 </div>
 
@@ -337,7 +311,7 @@ function SelectSlot({ labCartItems }) {
                                         </span>
                                         <div
                                             onClick={toggleApplyToAll}
-                                            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${applyToAllEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                                            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${applyToAllEnabled ? 'bg-teal-600' : 'bg-gray-300'
                                                 }`}
                                         >
                                             <span
@@ -358,7 +332,7 @@ function SelectSlot({ labCartItems }) {
                     <div className="lg:w-3/4">
                         {/* Packages List */}
                         <div className="space-y-4 mb-8">
-                            {labCartItems?.map((pkg, index) => {
+                            {labCartItems.map((pkg, index) => {
                                 const pkgId = pkg.labPackage.id;
                                 const completed = isPackageCompleted(pkgId);
                                 const isActive = activePackage === pkgId;
@@ -367,7 +341,7 @@ function SelectSlot({ labCartItems }) {
                                     <div
                                         key={pkgId}
                                         className={`bg-white rounded-lg shadow-sm border transition-all duration-200 ${isActive
-                                            ? 'ring-2 ring-blue-500 border-blue-300'
+                                            ? 'ring-2 ring-teal-500 border-teal-300'
                                             : completed
                                                 ? 'border-green-200'
                                                 : 'border-gray-200'
@@ -412,10 +386,10 @@ function SelectSlot({ labCartItems }) {
                                                     <button
                                                         onClick={() => onClickPackage(pkg)}
                                                         className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors border ${isActive
-                                                            ? "bg-blue-50 text-blue-700 border-blue-300"
+                                                            ? "bg-teal-50 text-teal-700 border-teal-300"
                                                             : completed
                                                                 ? "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                                                                : "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                                                                : "bg-teal-600 text-white border-teal-600 hover:bg-teal-700"
                                                             }`}
                                                     >
                                                         {isActive ? "Editing..." : completed ? "Edit" : "Select"}
@@ -444,7 +418,7 @@ function SelectSlot({ labCartItems }) {
                                                             value={appointmentDate}
                                                             onChange={(e) => setAppointmentDate(e.target.value)}
                                                             min={new Date().toISOString().split('T')[0]}
-                                                            className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base font-medium"
+                                                            className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-base font-medium"
                                                         />
                                                         <span className="text-sm text-gray-500">
                                                             Select your preferred appointment date
@@ -473,7 +447,7 @@ function SelectSlot({ labCartItems }) {
                                                                             onClick={() => onSelectSlot(slot)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${isChosen
                                                                                 ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
+                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-2">
@@ -518,7 +492,7 @@ function SelectSlot({ labCartItems }) {
                                                                             onClick={() => onSelectFamily(fm)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${chosen
                                                                                 ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
+                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-2">
@@ -536,51 +510,6 @@ function SelectSlot({ labCartItems }) {
                                                                                     {fm.relationship}
                                                                                 </div>
                                                                             )}
-                                                                        </button>
-                                                                    );
-                                                                })
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Address Selection */}
-                                                {activeStep === "address" && (
-                                                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                                        <h4 className="text-base font-medium text-gray-900 mb-4">
-                                                            Select Address
-                                                        </h4>
-                                                        <div className="grid grid-cols-1 gap-3">
-                                                            {addresses.length === 0 ? (
-                                                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                                                    <div className="text-lg mb-2">No addresses found</div>
-                                                                    <p className="text-sm">Add addresses in your profile</p>
-                                                                </div>
-                                                            ) : (
-                                                                addresses.map((ad) => {
-                                                                    const chosen = selections[pkgId]?.selectedAddressId === String(ad.id);
-                                                                    return (
-                                                                        <button
-                                                                            key={ad.id}
-                                                                            onClick={() => onSelectAddress(ad)}
-                                                                            className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                                                                ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
-                                                                                }`}
-                                                                        >
-                                                                            <div className="flex items-center justify-between mb-2">
-                                                                                <div className="font-medium text-gray-900">
-                                                                                    {ad.city}
-                                                                                </div>
-                                                                                {chosen && (
-                                                                                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                                                        <span className="text-white text-xs">✓</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="text-sm text-gray-600">
-                                                                                {ad.houseNumber || ad.fullAddress}
-                                                                            </div>
                                                                         </button>
                                                                     );
                                                                 })
@@ -612,7 +541,7 @@ function SelectSlot({ labCartItems }) {
                                         disabled={loading}
                                         className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors min-w-[140px] ${loading
                                             ? "bg-gray-400 cursor-not-allowed"
-                                            : "bg-blue-600 hover:bg-blue-700"
+                                            : "bg-teal-600 hover:bg-teal-700"
                                             }`}
                                     >
                                         {loading ? (
@@ -634,4 +563,4 @@ function SelectSlot({ labCartItems }) {
     );
 }
 
-export default SelectSlot;
+export default VisitLabSelectSlot;

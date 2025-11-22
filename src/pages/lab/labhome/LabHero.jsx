@@ -35,6 +35,13 @@ const LabHero = () => {
     useEffect(() => {
         setScreen('Lab')
     }, [screen])
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }, []);
+
 
     // Load search history
     useEffect(() => {

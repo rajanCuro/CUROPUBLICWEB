@@ -88,7 +88,7 @@ function MedicneSubcategoryProduct() {
                         <div
                             key={item.subCatid}
                             onClick={() => getProductBySubCategory(item, index)}
-                            className={`border rounded-md p-3 flex flex-col items-center cursor-pointer transition ${activeIndex === index
+                            className={`border rounded-md p-2 md:p-3 flex flex-col items-center cursor-pointer transition ${activeIndex === index
                                 ? "bg-green-100 border-green-500 shadow-md"
                                 : "bg-white border-gray-200 hover:shadow-md"
                                 }`}
@@ -96,10 +96,10 @@ function MedicneSubcategoryProduct() {
                             <img
                                 src={item.imageUrl}
                                 alt={item.subCatname}
-                                className="h-8 md:h-20 md:w-20 object-cover rounded-md"
+                                className="h-5 md:h-20 md:w-20 object-cover rounded-md"
                             />
 
-                            <p className="mt-2 text-center text-xs md:text-sm md:font-medium">
+                            <p className="mt-2 text-center text-xs md:text-sm md:font-medium font-normal">
                                 {window.innerWidth < 640
                                     ? item.subCatname.slice(0, 10) +
                                     (item.subCatname.length > 10 ? "..." : "")

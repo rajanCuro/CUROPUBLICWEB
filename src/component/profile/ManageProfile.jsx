@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MedicineOrder from "../../pages/medicine/MedicineOrder";
 import SavedAddress from "./SavedAddress";
 import MyProfile from "./Profile";
+import LabAppointmentList from "../../pages/lab/labhome/LabAppoitmentList";
 import { FiMenu, FiX } from "react-icons/fi";
 
 function ManageProfile() {
@@ -17,6 +18,8 @@ function ManageProfile() {
     { name: "Manage Profile", key: "profile" },
     { name: "My Orders", key: "orders" },
     { name: "Address Book", key: "address" },
+    { name: "My Appointments", key: "appointments" },
+    { name: "My Reports", key: "reports" },
   ];
 
   const handleMenuClick = (key) => {
@@ -100,6 +103,7 @@ function ManageProfile() {
           {activePage === "profile" && <MyProfile />}
           {activePage === "orders" && <MedicineOrder />}
           {activePage === "address" && <SavedAddress />}
+          {activePage === "appointments" && <LabAppointmentList />}
         </div>
       </div>
     </div>

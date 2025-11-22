@@ -15,7 +15,7 @@ import { useLabAuth } from "../../Authorization/LabAuthContext";
 
 const MedicineHero = () => {
     const navigate = useNavigate();
-    const sliderImages = [heroImg, sl1, sl2];
+    const sliderImages = [`https://images.pexels.com/photos/2280551/pexels-photo-2280551.jpeg`, `https://images.pexels.com/photos/1164531/pexels-photo-1164531.jpeg`, `https://images.pexels.com/photos/4167541/pexels-photo-4167541.jpeg`];
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false);
     const [uploadMode, setUploadMode] = useState("normal");
     const [searchText, setSearchText] = useState("");
@@ -113,11 +113,10 @@ const MedicineHero = () => {
 
     return (
         <section className="w-full  container mx-auto">
-            <div className="w-full mx-auto flex flex-col md:flex-row items-start mt-20 justify-between ">
+            <div className="w-full mx-auto flex flex-col md:flex-row items-center mt-20 justify-between ">
                 {/* LEFT AREA - equal width */}
-                <div className="w-1/2 text-center md:text-left  p-2 hidden md:block">
-
-                    <h1 className="text-2xl md:text-4xl font-bold leading-tight">
+                <div className="w-full md:w-1/2 text-center md:text-left  p-2 hidden md:block space-y-6 ">
+                    <h1 className="text-xl md:text-5xl font-bold leading-tight ">
                         <span className="bg-gradient-to-r from-teal-800 to-teal-300 text-transparent bg-clip-text">
                             <TypeAnimation
                                 sequence={[
@@ -135,11 +134,12 @@ const MedicineHero = () => {
                         </span>
                     </h1>
 
-                    <h2 className="text-xl md:text-3xl font-semibold text-gray-800 mt-1">
+
+                    <h2 className="text-md md:text-xl font-semibold text-gray-800 mt-2">
                         Fast & Reliable Pharmacy Services
                     </h2>
 
-                    <p className="text-gray-600 mt-3 max-w-md">
+                    <p className="text-gray-600 mt-3 text-sm max-w-md">
                         Order medicines, health products, and consultation from trusted pharmacies.
                     </p>
 
@@ -215,8 +215,7 @@ const MedicineHero = () => {
                 </div>
 
                 {/* RIGHT SLIDER - equal width */}
-                <div className="w-1/2  relative rounded-2xl overflow-hidden  h-[350px] md:h-[420px] mx-auto ">
-
+                <div className="w-full max-w-2xl relative rounded-2xl overflow-hidden h-64 sm:h-80 md:h-96 lg:h-[400px] mx-auto ">
                     <div className="relative w-full h-full overflow-hidden">
                         {sliderImages.map((image, index) => (
                             <div
@@ -249,6 +248,8 @@ const MedicineHero = () => {
                         ))}
                     </div>
                 </div>
+
+
             </div>
 
             <MedicinePopularCategories />
