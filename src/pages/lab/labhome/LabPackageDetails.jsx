@@ -1,6 +1,6 @@
 // src/pages/lab/labhome/LabPackageDetails.jsx
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     MapPin,
@@ -19,6 +19,12 @@ function LabPackageDetails() {
     const location = useLocation();
     const navigate = useNavigate();
     const item = location.state;
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }, []);
 
     const { labPackage, distance, latitude, longitude } = item;
     const discountedPrice = labPackage?.price * (1 - labPackage?.discount / 100);

@@ -1,16 +1,25 @@
 // src/pages/lab/labhome/LabCollectionTypeSinglePackage.jsx
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import { MdHome } from "react-icons/md";
 import { BiBuildingHouse } from "react-icons/bi";
+import LabSinglePackageHomeCollection from './LabSinglePackageHomeCollection';
+import LabSinglePackageSelectSlot from './LabSinglePackageSelectSlot';
 
 
 function LabCollectionTypeSinglePackage() {
     const [collectionType, setCollectionType] = useState('home');
     const location = useLocation();
     const labCartItems = location.state || [];
-    // const labCartItems = location.state || [];
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }, []);
+
 
     return (
         <div className="container mx-auto p-4">
@@ -45,11 +54,11 @@ function LabCollectionTypeSinglePackage() {
             {/* Conditional Rendering */}
             {collectionType === 'home' ? (
                 <div>
-                    home collection single package slot selection component here
+                    <LabSinglePackageHomeCollection labCartItems={[labCartItems]} />
                 </div>
             ) : (
                 <div>
-                    visit lab single package slot selection component here
+                    <LabSinglePackageSelectSlot labCartItems={[labCartItems]} />
                 </div>
             )}
 

@@ -28,6 +28,8 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
         }
     };
 
+    
+
 
 
     const defaultImageURL =
@@ -48,7 +50,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                 >
                     <img
                         className="w-full md:h-24 h-16 rounded-t-xl object-contain"
-                        src={item?.pharmacyMedicineBatch?.medicine?.image || defaultImageURL}
+                        src={item?.pharmacyMedicineBatch?.medicine?.imagesUrl[0] || defaultImageURL}
                         alt={item?.pharmacyMedicineBatch?.medicine?.name || "Medicine"}
                     />
 

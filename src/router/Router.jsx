@@ -22,6 +22,9 @@ import DoctorRouting from './DoctorRouting'
 import AmbulanceRouting from './AmbulanceRouting'
 import { StompProvider } from '../notification/StompSocket'
 import PrescriptionWaiting from '../component/PrescriptionWaiting'
+import PrivacyCenter from '../component/PrivacyPolicy'
+import TermsAndConditions from '../component/TermsService'
+import ReturnRefundPolicy from '../component/ReturnRefundPolicy'
 
 function Router() {
   return (
@@ -44,8 +47,13 @@ function Router() {
           <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
           <Route path='/medicine/order' element={<MedicineOrder />} />
           <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
-          <Route path='/prescription-waiting' element={<PrescriptionWaiting/>}/>
-          <Route path='/medicine/payment/:prescription' element={<MedicinePaymentMethod/>}/>
+          <Route path='/prescription-waiting' element={<PrescriptionWaiting />} />
+          <Route path='/medicine/payment/:prescription' element={<MedicinePaymentMethod />} />
+
+          {/* footer routing */}
+          <Route path='/privacy_policy' element={<PrivacyCenter />} />
+          <Route path='/terms_of_service' element={<TermsAndConditions />} />
+          <Route path='/return_refund_policies' element={<ReturnRefundPolicy />} />
 
         </Routes>
         <LabRouting />

@@ -1,12 +1,11 @@
-// src/pages/lab/labhome/LabSinglePackageSelectSlot.jsx
+// src/pages/lab/labhome/LabSinglePackageHomeCollection.jsx
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 
-function LabSinglePackageSelectSlot({ labCartItems }) {
-  console.log("LabSinglePackageSelectSlot labCartItems:", labCartItems);
+function LabSinglePackageHomeCollection({ labCartItems }) {
   const { userData, getAllLabCartItems } = useLabAuth();
   const userId = userData?.id;
   const navigate = useNavigate();
@@ -16,6 +15,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
 
   const [slots, setSlots] = useState([]);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [addresses, setAddresses] = useState([]);
 
   const [activePackage, setActivePackage] = useState(null);
   const [activeStep, setActiveStep] = useState(null);
@@ -49,8 +49,21 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
     }
   };
 
+  const fetchAddress = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `/endUserAddress/getAddressByUserId/${userData?.id}`
+      );
+      setAddresses(res.data?.dto || res.data || []);
+    } catch (err) {
+      console.error("fetchAddress:", err);
+      setAddresses([]);
+    }
+  };
+
   useEffect(() => {
     fetchFamilyMembers();
+    fetchAddress();
   }, []);
 
   useEffect(() => {
@@ -124,8 +137,15 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   const onSelectFamily = (fm) => {
     updateSelectionForActivePackage({
       patientId: String(fm.id),
-      patientName: fm.name,
-      selectedAddressId: null // Set addressId to null
+      patientName: fm.name
+    });
+    setActiveStep("address");
+  };
+
+  const onSelectAddress = (ad) => {
+    updateSelectionForActivePackage({
+      selectedAddressId: String(ad.id),
+      addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
     });
     setActivePackage(null);
     setActiveStep(null);
@@ -140,14 +160,14 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
           s &&
           s.appointmentDate &&
           s.selectedSlotId &&
-          s.selectedAddressId !== undefined && // Check if addressId is defined (can be null)
+          s.selectedAddressId &&
           s.selectedPackageId &&
           s.patientId
       )
       .map(s => ({
         appointmentDate: s.appointmentDate,
         selectedSlotId: s.selectedSlotId,
-        selectedAddressId: s.selectedAddressId, // This will be null
+        selectedAddressId: s.selectedAddressId,
         selectedPackageId: s.selectedPackageId,
         patientId: s.patientId
       }));
@@ -163,6 +183,8 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
       console.log("Order response:", response.data);
       await getAllLabCartItems()
       navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
+
+      // navigate('/lab/appointment/confirm');
     } catch (error) {
       console.error("Order error:", error.response?.data || error.message);
       // You might want to add error notification here
@@ -177,7 +199,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
       s &&
       s.appointmentDate &&
       s.selectedSlotId &&
-      s.selectedAddressId !== undefined && // Check if addressId is defined (can be null)
+      s.selectedAddressId &&
       s.selectedPackageId &&
       s.patientId
     );
@@ -188,6 +210,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
     if (!s) return null;
     const slotName = s.slotStartAt && s.slotEndAt ? `${s.slotStartAt} - ${s.slotEndAt}` : "N/A";
     const patientName = s.patientName || "N/A";
+    const addressName = s.addressName || "N/A";
 
     return (
       <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
@@ -195,7 +218,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
           <div className="w-2 h-2 bg-green-600 rounded-full"></div>
           <span className="text-sm font-medium text-gray-700">All details selected</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="flex flex-col">
             <span className="text-xs font-medium text-gray-500 mb-1">Date</span>
             <span className="text-sm font-semibold text-gray-900">{s.appointmentDate}</span>
@@ -208,6 +231,10 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
             <span className="text-xs font-medium text-gray-500 mb-1">Patient</span>
             <span className="text-sm font-semibold text-gray-900">{patientName}</span>
           </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-gray-500 mb-1">Address</span>
+            <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>{addressName}</span>
+          </div>
         </div>
       </div>
     );
@@ -216,14 +243,15 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   const renderStepIndicator = () => {
     const steps = [
       { key: "slots", label: "Select Slot", icon: "🕒" },
-      { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" }
+      { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
+      { key: "address", label: "Select Address", icon: "📍" }
     ];
 
     const currentIndex = steps.findIndex(step => step.key === activeStep);
 
     return (
       <div className="mb-8">
-        <div className="flex items-center justify-between max-w-md mx-auto">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
           {steps.map((step, index) => (
             <React.Fragment key={step.key}>
               <div className="flex flex-col items-center">
@@ -269,6 +297,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
             Select time slots and details for your lab packages
           </p>
         </div>
+
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Sidebar - Progress Summary */}
@@ -382,7 +411,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                                   <div key={idx}>
                                     <span>{tst.testName}</span>
                                     <div>
-                                      {tst.symptoms.map((symp,index) => (
+                                      {tst.symptoms.map((symp, index) => (
                                         <div key={index} className="text-xs text-gray-500">
                                           - {symp}
                                         </div>
@@ -529,6 +558,51 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                             </div>
                           </div>
                         )}
+
+                        {/* Address Selection */}
+                        {activeStep === "address" && (
+                          <div className="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 className="text-base font-medium text-gray-900 mb-4">
+                              Select Address
+                            </h4>
+                            <div className="grid grid-cols-1 gap-3">
+                              {addresses.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                  <div className="text-lg mb-2">No addresses found</div>
+                                  <p className="text-sm">Add addresses in your profile</p>
+                                </div>
+                              ) : (
+                                addresses.map((ad) => {
+                                  const chosen = selections[pkgId]?.selectedAddressId === String(ad.id);
+                                  return (
+                                    <button
+                                      key={ad.id}
+                                      onClick={() => onSelectAddress(ad)}
+                                      className={`p-4 rounded-lg border text-left transition-colors ${chosen
+                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
+                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
+                                        }`}
+                                    >
+                                      <div className="flex items-center justify-between mb-2">
+                                        <div className="font-medium text-gray-900">
+                                          {ad.city}
+                                        </div>
+                                        {chosen && (
+                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                            <span className="text-white text-xs">✓</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-sm text-gray-600">
+                                        {ad.houseNumber || ad.fullAddress}
+                                      </div>
+                                    </button>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -575,4 +649,4 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   );
 }
 
-export default LabSinglePackageSelectSlot;
+export default LabSinglePackageHomeCollection;

@@ -1,293 +1,313 @@
-// src/pages/lab/labhome/LabAppoitmentConfirm.jsx
 // src/pages/lab/labhome/LabAppointmentConfirm.jsx
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle, Calendar, Clock, MapPin, User, Phone, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  CheckCircle,
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Phone,
+  FileText,
+  Download,
+  Share2,
+  Home
+} from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function LabAppointmentConfirm() {
-  const [appointment, setAppointment] = useState({
-    id: 'APT-2024-00123',
-    patientName: 'Sarah Johnson',
-    testType: 'Complete Blood Count (CBC)',
-    date: '2024-01-15',
-    time: '10:30 AM',
-    labName: 'Metro Diagnostic Center',
-    address: '123 Healthcare Ave, Medical District, NY 10001',
-    phone: '+1 (555) 123-4567',
-    duration: '30 minutes',
-    preparation: 'Fasting required for 8 hours before the test',
-    status: 'confirmed'
-  });
-
-  const [countdown, setCountdown] = useState(10);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { orderResponse } = location.state || {};
+  const [appointment, setAppointment] = useState(orderResponse?.response?.[0] || {});
+  const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          // Redirect or perform action when countdown ends
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (orderResponse?.response?.[0]) {
+      setAppointment(orderResponse.response[0]);
+    }
 
-    return () => clearInterval(timer);
-  }, []);
+    // Auto-hide confetti after 3 seconds
+    const confettiTimer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 3000);
+
+    return () => clearTimeout(confettiTimer);
+  }, [orderResponse]);
+
+  // Confetti animation components
+  const Confetti = () => {
+    return (
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: '-10px',
+              backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'][
+                Math.floor(Math.random() * 5)
+              ],
+            }}
+            initial={{ y: -20, rotate: 0 }}
+            animate={{
+              y: window.innerHeight,
+              rotate: 360,
+              x: Math.random() * 100 - 50,
+            }}
+            transition={{
+              duration: Math.random() * 2 + 1,
+              repeat: 0,
+              ease: "easeOut",
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.2
+        duration: 0.8,
+        staggerChildren: 0.15
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0, scale: 0.9 },
     visible: {
       y: 0,
       opacity: 1,
+      scale: 1,
       transition: {
-        duration: 0.5
+        type: "spring",
+        stiffness: 100,
+        damping: 12
       }
     }
   };
 
-  const downloadReport = () => {
-    // Simulate download functionality
-    alert('Downloading appointment details...');
-  };
-
-  const shareAppointment = () => {
-    // Simulate share functionality
-    if (navigator.share) {
-      navigator.share({
-        title: 'Lab Appointment Confirmation',
-        text: `Your lab appointment is confirmed for ${appointment.date} at ${appointment.time}`,
-        url: window.location.href,
-      });
-    } else {
-      alert('Appointment details copied to clipboard!');
+  const cardHoverVariants = {
+    hover: {
+      y: -5,
+      scale: 1.02,
+      transition: {
+        type: "spring",
+        stiffness: 300
+      }
     }
   };
 
+  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 py-8 px-4">
+      <AnimatePresence>
+        {showConfetti && <Confetti />}
+      </AnimatePresence>
+
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8"
+          transition={{ duration: 0.8, type: "spring" }}
+          className="text-center mb-12"
         >
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Appointment Confirmed!</h1>
-          <p className="text-gray-600">Your lab test has been successfully scheduled</p>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            className="inline-block mb-4"
+          >
+            <div className="relative">
+              <CheckCircle
+                size={80}
+                className="text-green-500 drop-shadow-lg"
+              />
+              <motion.div
+                className="absolute inset-0 bg-green-500 rounded-full"
+                initial={{ scale: 0, opacity: 0.5 }}
+                animate={{ scale: 2, opacity: 0 }}
+                transition={{ duration: 1.5, delay: 0.5 }}
+              />
+            </div>
+          </motion.div>
+          <h1 className="text-md md:text-4xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            Appointment Confirmed!
+          </h1>
+          <p className="text-xl text-gray-600 max-w-md mx-auto leading-relaxed">
+            Your lab test has been successfully scheduled. We've sent a confirmation to your email.
+          </p>
         </motion.div>
 
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="bg-white rounded-2xl shadow-xl overflow-hidden"
+          className="grid grid-cols-1 "
         >
-          {/* Success Header */}
+          {/* Main Confirmation Card */}
           <motion.div
             variants={itemVariants}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white text-center"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="flex justify-center mb-4"
-            >
-              <CheckCircle size={64} className="text-white" />
-            </motion.div>
-            <h2 className="text-2xl font-bold mb-2">Booking Confirmed</h2>
-            <p className="opacity-90">Your appointment ID: {appointment.id}</p>
+            className="lg:col-span-2"
+           >
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+              {/* Success Header */}
+              <motion.div
+                variants={itemVariants}
+                className="bg-gradient-to-r from-green-500 via-teal-500 to-teal-700 p-8 text-white relative overflow-hidden"
+               >
+                <div className="absolute inset-0 bg-white opacity-10"></div>
+                <div className="relative z-10 text-center">
+                  <motion.h2
+                    className="text-md md:text-3xl font-bold mb-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                   >
+                    Booking Confirmed! 🎉
+                  </motion.h2>
+                  <p className="text-lg opacity-95">We're looking forward to seeing you!</p>
+                </div>
+
+                {/* Animated background elements */}
+                <motion.div
+                  className="absolute -top-4 -right-4 w-20 h-20 bg-white opacity-10 rounded-full"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 180, 360],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+              </motion.div>
+
+              {/* Appointment Details */}
+              <div className="p-8">
+                <motion.div
+                  variants={itemVariants}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+                >
+                  <motion.div
+                    className="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl"
+                    whileHover="hover"
+                    variants={cardHoverVariants}
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Appointment Date</p>
+                      <p className="font-semibold text-gray-800">
+                        {appointment.appointmentDate || 'Not specified'}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="flex items-center space-x-4 p-4 bg-purple-50 rounded-xl"
+                    whileHover="hover"
+                    variants={cardHoverVariants}
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Appointment Number</p>
+                      <p className="font-semibold text-gray-800">
+                        {appointment.appointmentNumber || 'N/A'}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl"
+                    whileHover="hover"
+                    variants={cardHoverVariants}
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Appointment ID</p>
+                      <p className="font-semibold text-gray-800">
+                        {appointment.id || 'N/A'}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="flex items-center space-x-4 p-4 bg-orange-50 rounded-xl"
+                    whileHover="hover"
+                    variants={cardHoverVariants}
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                      <User className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Status</p>
+                      <p className="font-semibold text-green-600">Confirmed</p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+
+                {/* Additional Information */}
+                <motion.div
+                  variants={itemVariants}
+                  className="bg-gray-50 rounded-2xl p-6 border border-gray-200"
+                >
+                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
+                    <FileText className="w-5 h-5 mr-2 text-gray-600" />
+                    Important Notes
+                  </h3>
+                  <ul className="text-sm text-gray-600 space-y-2">
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      Please arrive 15 minutes before your scheduled time
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      Bring a valid ID and your insurance card
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      Fasting may be required for certain tests
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      Contact us if you need to reschedule
+                    </li>
+                  </ul>
+                </motion.div>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Appointment Details */}
-          <div className="p-6 space-y-6">
-            {/* Patient Information */}
-            <motion.div variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <User className="w-5 h-5 mr-2 text-blue-600" />
-                Patient Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">Patient Name</p>
-                  <p className="font-semibold text-gray-800">{appointment.patientName}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">Test Type</p>
-                  <p className="font-semibold text-gray-800">{appointment.testType}</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Appointment Schedule */}
-            <motion.div variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Appointment Schedule</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <Calendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Date</p>
-                  <p className="font-semibold text-gray-800">{appointment.date}</p>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Time</p>
-                  <p className="font-semibold text-gray-800">{appointment.time}</p>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">Duration</p>
-                  <p className="font-semibold text-gray-800">{appointment.duration}</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Lab Information */}
-            <motion.div variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Lab Information</h3>
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <MapPin className="w-5 h-5 text-red-500 mr-3 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-gray-800">{appointment.labName}</p>
-                      <p className="text-gray-600 text-sm mt-1">{appointment.address}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <Phone className="w-5 h-5 text-green-600 mr-3" />
-                    <div>
-                      <p className="font-semibold text-gray-800">{appointment.phone}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Preparation Instructions */}
-            <motion.div variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Preparation Instructions</h3>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-800 text-sm">{appointment.preparation}</p>
-              </div>
-            </motion.div>
-
-            {/* Important Notes */}
-            <motion.div variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Important Notes</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3"></div>
-                  <span>Please arrive 15 minutes before your scheduled appointment time</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3"></div>
-                  <span>Bring your ID and insurance card (if applicable)</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3"></div>
-                  <span>Wear comfortable clothing with easy access to your arm</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3"></div>
-                  <span>Stay hydrated before your test</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
-
-          {/* Action Buttons */}
+          {/* Sidebar Actions */}
           <motion.div
             variants={itemVariants}
-            className="bg-gray-50 px-6 py-4 border-t border-gray-200"
+            className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={downloadReport}
-                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center hover:bg-blue-700 transition-colors"
-              >
-                <FileText className="w-5 h-5 mr-2" />
-                Download Details
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={shareAppointment}
-                className="flex-1 bg-white text-blue-600 py-3 px-6 rounded-lg font-semibold border border-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors"
-              >
-                Share Appointment
-              </motion.button>
-            </div>
           </motion.div>
         </motion.div>
 
-        {/* Countdown & Next Steps */}
+        {/* Footer Note */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-6 text-center"
-        >
-          <p className="text-gray-600 mb-2">
-            You will be redirected to the dashboard in <span className="font-bold text-blue-600">{countdown}</span> seconds
-          </p>
-          <p className="text-sm text-gray-500">
-            Check your email for the confirmation and reminder
-          </p>
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-4 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow"
-          >
-            <Calendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-700">Reschedule</p>
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-4 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow"
-          >
-            <Clock className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-700">Add to Calendar</p>
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-4 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow"
-          >
-            <MapPin className="w-6 h-6 text-red-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-700">Get Directions</p>
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-4 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow"
-          >
-            <Phone className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-700">Contact Lab</p>
-          </motion.button>
+          className="text-center mt-8 text-gray-500 text-sm"
+         >
+          <p>You will receive a reminder 24 hours before your appointment</p>
         </motion.div>
       </div>
     </div>

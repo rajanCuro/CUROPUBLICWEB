@@ -77,7 +77,7 @@ function SubCategoryMedicineDetails() {
 
                             {/* Ratings */}
                             <div className="flex items-center gap-3 mt-2">
-                                <span className="bg-green-600 text-white px-2 py-1 rounded-md text-sm font-semibold">
+                                <span className="bg-teal-600 text-white px-2 py-1 rounded-md text-sm font-semibold">
                                     4.3 ★
                                 </span>
                                 <span className="text-gray-600">
@@ -88,7 +88,7 @@ function SubCategoryMedicineDetails() {
                             {/* Price */}
                             <div className="mt-4 flex items-center gap-3">
                                 {/* SELLING PRICE */}
-                                <p className="text-green-600 text-2xl font-bold">
+                                <p className="text-teal-600 text-2xl font-bold">
                                     ₹{medicine?.unitPrice}
                                 </p>
 
@@ -98,7 +98,7 @@ function SubCategoryMedicineDetails() {
                                 </p> */}
 
                                 {/* AUTO-CALCULATED DISCOUNT */}
-                                <p className="text-green-600 font-semibold">
+                                <p className="text-teal-600 font-semibold">
                                     (0) %off
                                     {/* {Math.round(
                                         ((medicine?.unitPrice - medicine?.costPrice) / medicine?.unitPrice) * 100
@@ -135,13 +135,13 @@ function SubCategoryMedicineDetails() {
 
                 {/* RIGHT SECTION – ADD TO CART CARD */}
                 <div className="bg-white rounded-xl p-6 shadow-sm  sticky top-10">
-                    <p className="text-green-600 text-2xl font-bold">
+                    <p className="text-teal-600 text-2xl font-bold">
                         ₹{medicine?.unitPrice}
                     </p>
 
                     <div className="flex items-center gap-2 mt-2">
                         {/* <p className="line-through text-gray-500 text-lg">₹120</p> */}
-                        <p className="text-green-600 font-semibold text-lg">
+                        <p className="text-teal-600 font-semibold text-lg">
                             {data?.discount || 0}% off
                         </p>
                     </div>
@@ -153,7 +153,7 @@ function SubCategoryMedicineDetails() {
                     {/* Add to Cart */}
                     <button
                         onClick={() => handleAddtocart(data)}
-                        className="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
+                        className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
                     >
                         {addingCart ? <span className="loading loading-spinner loading-sm"></span> : "Add to cart"}
                     </button>

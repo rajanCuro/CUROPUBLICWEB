@@ -110,7 +110,13 @@ function MedicneSubcategoryProduct() {
                 </div>
 
                 {/* Product List */}
-                <div className="">
+                <div className="  w-full">
+                    {
+                        productList.length === 0 && !fetching && (
+                            <div className="flex h-[40vh]  items-center justify-center mt-10">
+                                <p className="text-gray-400 text-lg italic">No products available in this subcategory.</p>
+                            </div>
+                        )}
                     <MedicineProductBySubCategory productList={productList} loading={fetching} />
                 </div>
 

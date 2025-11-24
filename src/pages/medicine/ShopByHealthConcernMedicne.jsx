@@ -64,7 +64,7 @@ const ShopByHealthConcernMedicne = () => {
     return (
         <div className="container mx-auto mt-6 mb-10 px-3 h-screen">
             <h2 className="text-2xl font-bold mb-3">
-                Medicines for: <span className="text-green-600">{name}</span>
+                Medicines for: <span className="text-teal-600">{name}</span>
             </h2>
 
             {loading && <p className="text-gray-500">Loading...</p>}
@@ -84,7 +84,7 @@ const ShopByHealthConcernMedicne = () => {
                         {/* Image Container */}
                         <div className="relative w-full h-36 bg-gray-50 rounded-t-xl overflow-hidden p-4">
                             <img
-                                src={defaultImageURL}
+                                src={item.medicine.imagesUrl[0] || defaultImageURL}
                                 alt={item.medicine?.name}
                                 className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                             />
@@ -97,14 +97,14 @@ const ShopByHealthConcernMedicne = () => {
                         {/* Content Container */}
                         <div className="flex-1 p-4 flex flex-col">
                             {/* Medicine Name */}
-                            <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 group-hover:text-green-600 transition-colors">
+                            <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 group-hover:text-teal-600 transition-colors">
                                 {item.medicine?.name}
                             </h3>
 
                             {/* Price Information */}
                             <div className="mt-auto">
                                 <p className="text-gray-600 text-sm mb-3">
-                                    MRP: <span className="font-bold text-green-600">₹{item.unitPrice}</span>
+                                    MRP: <span className="font-bold text-teal-600">₹{item.unitPrice}</span>
                                 </p>
 
                                 {/* Add to Cart Button */}
@@ -113,7 +113,7 @@ const ShopByHealthConcernMedicne = () => {
                                         e.stopPropagation();
                                         handleAddtocart(item);
                                     }}
-                                    className="w-full bg-green-600 hover:bg-green-700 text-white py-2 cursor-pointer rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 group/btn"
+                                    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 cursor-pointer rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 group/btn"
                                 >
 
                                     {addingCartId === item.id ? <span className="loading loading-spinner loading-sm"></span> : "Add to Cart"}

@@ -258,7 +258,7 @@ function SelectSlot({ labCartItems }) {
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-medium transition-all duration-300 ${index < currentIndex
                                     ? "bg-green-600 text-white"
                                     : index === currentIndex
-                                        ? "bg-blue-600 text-white ring-2 ring-blue-200"
+                                        ? "bg-teal-600 text-white ring-2 ring-teal-200"
                                         : "bg-gray-100 text-gray-400 border border-gray-300"
                                     }`}>
                                     {index < currentIndex ? "✓" : step.icon}
@@ -289,14 +289,15 @@ function SelectSlot({ labCartItems }) {
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                <div className="mb-8 flex flex-col items-start">
+                    <h1 className="text-md md:text-3xl font-bold text-gray-900 mb-1">
                         Schedule Lab Tests
                     </h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-gray-600 text-[12px] md:text-sm">
                         Select time slots and details for your lab packages
                     </p>
                 </div>
+
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Sidebar - Progress Summary */}
@@ -337,7 +338,7 @@ function SelectSlot({ labCartItems }) {
                                         </span>
                                         <div
                                             onClick={toggleApplyToAll}
-                                            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${applyToAllEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                                            className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${applyToAllEnabled ? 'bg-teal-600' : 'bg-gray-300'
                                                 }`}
                                         >
                                             <span
@@ -367,7 +368,7 @@ function SelectSlot({ labCartItems }) {
                                     <div
                                         key={pkgId}
                                         className={`bg-white rounded-lg shadow-sm border transition-all duration-200 ${isActive
-                                            ? 'ring-2 ring-blue-500 border-blue-300'
+                                            ? 'ring-2 ring-teal-500 border-teal-300'
                                             : completed
                                                 ? 'border-green-200'
                                                 : 'border-gray-200'
@@ -412,10 +413,10 @@ function SelectSlot({ labCartItems }) {
                                                     <button
                                                         onClick={() => onClickPackage(pkg)}
                                                         className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors border ${isActive
-                                                            ? "bg-blue-50 text-blue-700 border-blue-300"
+                                                            ? "bg-teal-50 text-teal-700 border-teal-300"
                                                             : completed
                                                                 ? "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                                                                : "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                                                                : "bg-teal-600 text-white border-teal-600 hover:bg-teal-700"
                                                             }`}
                                                     >
                                                         {isActive ? "Editing..." : completed ? "Edit" : "Select"}
@@ -444,7 +445,7 @@ function SelectSlot({ labCartItems }) {
                                                             value={appointmentDate}
                                                             onChange={(e) => setAppointmentDate(e.target.value)}
                                                             min={new Date().toISOString().split('T')[0]}
-                                                            className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base font-medium"
+                                                            className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-base font-medium"
                                                         />
                                                         <span className="text-sm text-gray-500">
                                                             Select your preferred appointment date
@@ -473,7 +474,7 @@ function SelectSlot({ labCartItems }) {
                                                                             onClick={() => onSelectSlot(slot)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${isChosen
                                                                                 ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
+                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-2">
@@ -518,7 +519,7 @@ function SelectSlot({ labCartItems }) {
                                                                             onClick={() => onSelectFamily(fm)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${chosen
                                                                                 ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
+                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-2">
@@ -565,7 +566,7 @@ function SelectSlot({ labCartItems }) {
                                                                             onClick={() => onSelectAddress(ad)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${chosen
                                                                                 ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                                                                : "border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50"
+                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-2">
@@ -612,7 +613,7 @@ function SelectSlot({ labCartItems }) {
                                         disabled={loading}
                                         className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors min-w-[140px] ${loading
                                             ? "bg-gray-400 cursor-not-allowed"
-                                            : "bg-blue-600 hover:bg-blue-700"
+                                            : "bg-teal-600 hover:bg-teal-700"
                                             }`}
                                     >
                                         {loading ? (

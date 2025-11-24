@@ -11,7 +11,7 @@ import SimilaMedicineProduct from '../medicine/SimilarMedicineProduct'
 
 function MedicineCartItems() {
     const navigate = useNavigate();
-    const { userData, getAllMedicineCartItems } = useAuth();
+    const { userData, getAllMedicineCartItems, setAuthModal } = useAuth();
     const [handlingChareg, setHandlingChareg] = useState(12)
     const [cartData, setCartData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,7 +42,11 @@ function MedicineCartItems() {
         if (id) {
             getAllCartItems(id)
             getAllMedicineCartItems(id);
+        } else {
+            setAuthModal(true)
+            setLoading(false)
         }
+
     }, [userData]);
     const handleIncrease = async (itemId) => {
         const item = cartData.find((x) => x.id === itemId);
@@ -118,7 +122,7 @@ function MedicineCartItems() {
             <p className="text-gray-500 mb-4">Start adding items to your cart!</p>
             <button
                 onClick={() => navigate("/medicine/delivery")}
-                className="bg-green-500 text-white px-6 py-2 rounded-md shadow"
+                className="bg-teal-500 text-white px-6 py-2 rounded-md shadow"
             >
                 Browse Products
             </button>
@@ -128,7 +132,7 @@ function MedicineCartItems() {
     if (loading)
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <div className="animate-spin h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-10 w-10 border-4 border-teal-500 border-t-transparent rounded-full"></div>
                 <p className="mt-3 text-gray-600">Loading cart...</p>
             </div>
         );
@@ -150,19 +154,18 @@ function MedicineCartItems() {
             </p>
 
             {/* CART LIST */}
-            <div className="flex gap-4 ">
-                <div className="mt-4 space-y-4 w-2/3 border-r border-gray-300 pr-4">
+            <div className="flex flex-col md:flex-row gap-4 ">
+                {/* LEFT CART ITEMS */}
+                <div className="mt-4 space-y-4 md:w-2/3 md:border-r md:border-gray-300 md:pr-4 w-full">
                     {cartData.map((item) => {
                         const medicine = item.medicineBatch?.medicine;
 
                         return (
                             <div
                                 key={item.id}
-                                className="p-4  flex justify-between items-center gap-4  border-b border-gray-300 "
+                                className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-300"
                             >
-
-
-                                <div className="flex gap-4">
+                                <div className="flex gap-4 w-full md:w-auto">
                                     <img
                                         src={
                                             medicine?.imagesUrl?.[0] ||
@@ -174,23 +177,22 @@ function MedicineCartItems() {
                                         <h3 className="font-semibold text-gray-900 line-clamp-2">
                                             {medicine?.name || "Medicine"}
                                         </h3>
-                                        <p className="text-xs mt-1 text-gray-600">Strip of 10 tablets</p>
-
+                                        <p className="text-xs mt-1 text-gray-600">
+                                            Strip of 10 tablets
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <div>
-                                        <p className="text-sm text-gray-600">
-                                            ₹{item.unitPrice} × {item.quantity} ={" "}
-                                            <span className="font-semibold">
-                                                ₹{item.unitPrice * item.quantity}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-3 border border-green-600 w-32 mt-2 px-2 py-1 ">
+                                {/* PRICE & QUANTITY */}
+                                <div className="w-full md:w-auto">
+                                    <p className="text-sm text-gray-700 text-left md:text-right">
+                                        ₹{item.unitPrice} × {item.quantity} ={" "}
+                                        <span className="font-semibold">
+                                            ₹{item.unitPrice * item.quantity}
+                                        </span>
+                                    </p>
 
-                                        {/* LEFT BUTTON -> Trash OR "-" */}
+                                    <div className="flex items-center gap-3 border border-teal-600 w-32 mt-2 px-2 py-1">
                                         {item.quantity === 1 ? (
                                             <button
                                                 onClick={() => handleDeleteItem(item)}
@@ -201,70 +203,60 @@ function MedicineCartItems() {
                                         ) : (
                                             <button
                                                 onClick={() => handleDecrease(item.id)}
-                                                className="w-7 h-7 flex items-center justify-center  hover:bg-gray-100 cursor-pointer"
+                                                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 cursor-pointer"
                                             >
                                                 −
                                             </button>
                                         )}
 
-                                        {/* Quantity Number */}
                                         <span className="font-semibold text-gray-700 min-w-[1rem] text-center cursor-pointer">
                                             {item.quantity}
                                         </span>
 
-                                        {/* INCREASE BUTTON */}
                                         <button
                                             onClick={() => handleIncrease(item.id)}
-                                            className="w-7 h-7 flex items-center justify-center rounded-full  hover:bg-gray-100"
+                                            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100"
                                         >
                                             +
                                         </button>
-
                                     </div>
-
                                 </div>
                             </div>
                         );
                     })}
                 </div>
-                <div className="w-1/4   mt-10 ml-10 ">
-                    <div className="  mx-auto w-full">
 
+                {/* RIGHT BILL SUMMARY */}
+                <div className="md:w-1/4 w-full mt-10 md:ml-10">
+                    <div className="mx-auto w-full">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
                             Bill Summary
                         </h2>
 
                         <div className="space-y-3 text-sm">
-
-                            {/* Item Total */}
                             <div className="flex justify-between text-gray-700">
                                 <span>Item total (MRP)</span>
                                 <span className="font-medium">₹{totalAmount.toFixed(2)}</span>
                             </div>
 
-                            {/* Handling Charges */}
                             <div className="flex justify-between text-gray-700">
                                 <span>Handling charges</span>
                                 <span className="font-medium">₹{handlingChareg}</span>
                             </div>
 
-                            {/* Total Discount */}
                             <div className="flex justify-between text-gray-700">
                                 <span>Total discount</span>
-                                <span className="font-medium text-green-600">0</span>
+                                <span className="font-medium text-teal-600">0</span>
                             </div>
 
-                            {/* Shipping Fee */}
                             <div className="flex justify-between text-gray-700">
                                 <span>Shipping fee</span>
-                                <span className="font-medium text-green-600">Free</span>
+                                <span className="font-medium text-teal-600">Free</span>
                             </div>
-
                         </div>
 
                         <hr className="my-4" />
 
-                        {/* Grand Total */}
                         <div className="flex justify-between text-gray-900 text-base font-semibold">
                             <span>Grand Total</span>
                             <span>
@@ -272,31 +264,26 @@ function MedicineCartItems() {
                             </span>
                         </div>
 
-                    </div>
-
-                    <div className="  mt-10">
                         <button
-                            className="bg-green-600 w-full text-white px-4 cursor-pointer py-2 text-lg font-semibold"
+                            className="bg-teal-600 w-full mt-6 text-white px-4 cursor-pointer py-2 text-lg font-semibold"
                             onClick={() =>
                                 navigate("/medicine/payemnt", {
                                     state: {
                                         cartData,
-                                        totalAmount: (Number(totalAmount) + Number(handlingChareg)).toFixed(2)
-                                    }
+                                        totalAmount: (Number(totalAmount) + Number(handlingChareg)).toFixed(2),
+                                    },
                                 })
                             }
                         >
                             Continue
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-            <SimilaMedicineProduct name={"Fever"} />
 
+            <SimilaMedicineProduct name={"Fever"} />
         </div>
+
     );
 }
 

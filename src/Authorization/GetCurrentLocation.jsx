@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 function GetCurrentLocation() {
-    const [location, setLocation] = useState(null);
     const [address, setAddress] = useState("");
     const [error, setError] = useState("");
-    const { setLatitude, setLongitude } = useAuth()
+    const { setLatitude, setLongitude, latitude, longitude } = useAuth();
 
+    // 📍 Get browser location once on mount
     useEffect(() => {
         if (!navigator.geolocation) {
             setError("Geolocation is not supported by your browser.");
@@ -18,46 +18,63 @@ function GetCurrentLocation() {
             async (position) => {
                 const { latitude, longitude } = position.coords;
 
-                setLocation({ latitude, longitude });
+                setLatitude(latitude);
+                setLongitude(longitude);
 
                 console.log("Latitude:", latitude);
                 console.log("Longitude:", longitude);
-                setLatitude(latitude)
-                setLongitude(longitude)
-
-                try {
-                    // ✅ FIX: Using CORS proxy to avoid CORS blocking
-                    const url =
-                        `https://api.allorigins.win/get?url=` +
-                        encodeURIComponent(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-                        );
-
-                    const res = await fetch(url);
-                    const wrappedData = await res.json();
-                    const data = JSON.parse(wrappedData.contents);
-                    setAddress(data.display_name || "Address not found");
-                } catch (err) {
-                    console.error(err);
-                    setAddress("Unable to fetch address.");
-                }
             },
-            (err) => {
-                setError("Location access denied by user.");
-            }
+            () => setError("Location access denied by user.")
         );
     }, []);
 
+    // 🌍 Run reverse geocoding whenever lat/lng changes
+    useEffect(() => {
+        if (latitude && longitude) {
+            reverseGeocodeWithOSM(latitude, longitude);
+        }
+    }, [latitude, longitude]); // <- triggers on change
+
+    const reverseGeocodeWithOSM = async (lat, lng) => {
+        try {
+            const url =
+                `https://api.allorigins.win/get?url=` +
+                encodeURIComponent(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+                );
+
+            const res = await fetch(url);
+            const wrappedData = await res.json();
+            const data = JSON.parse(wrappedData.contents);
+
+            formatAddress(data.address);
+        } catch (err) {
+            console.error(err);
+            setAddress("Unable to fetch address.");
+        }
+    };
+
+    const formatAddress = (addr) => {
+        const formatted = [
+            addr.city || addr.town || addr.village || "",
+            addr.suburb || "",
+            addr.state_district || "",
+            addr.state || "",
+            addr.postcode || "",
+            addr.country || "",
+        ]
+            .filter(Boolean)
+            .join(", ");
+
+        setAddress(formatted);
+    };
+
     return (
         <div className="p-4">
-            {error && (
-                <p className="text-red-500 mt-3">
-                    <strong>Error:</strong> {error}
-                </p>
-            )}
+            {error && <p className="text-red-500 text-xs"><strong>Error:</strong> {error}</p>}
             {address && (
-                <p className="text-xs">
-                    {address}
+                <p className="text-xs mt-2">
+                    <strong>Location:</strong> {address}
                 </p>
             )}
         </div>

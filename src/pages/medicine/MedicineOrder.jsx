@@ -46,7 +46,7 @@ function MedicineOrder() {
       case 'cancelled':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'shipped':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-teal-100 text-teal-800 border-teal-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -71,7 +71,7 @@ function MedicineOrder() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -84,7 +84,7 @@ function MedicineOrder() {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={getAllOrderMedicine}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
           >
             Retry
           </button>
@@ -139,7 +139,7 @@ function MedicineOrder() {
                     {index === 0 && (
                       <td className="px-6 py-4 whitespace-nowrap align-top" rowSpan={order.orderItems.length}>
                         <div className="flex flex-col">
-                          <span className="text-xs md:text-md font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                          <span className="text-xs md:text-md font-semibold text-teal-600 hover:text-teal-800 transition-colors">
                             #{order.id}
                           </span>
                           <span className="text-sm text-gray-500 mt-1">
@@ -156,7 +156,7 @@ function MedicineOrder() {
                             {formatCurrency(order.totalAmount)}
                           </div>
                           <div>
-                            <button onClick={() => handleTrackOrder(order)} className='text-xs bg-blue-400 hover:bg-blue-600 text-white px-2 cursor-pointer py-1 rounded-lg'>Tack Order</button>
+                            <button onClick={() => handleTrackOrder(order)} className='text-xs bg-teal-400 hover:bg-teal-600 text-white px-2 cursor-pointer py-1 rounded-lg'>Tack Order</button>
                           </div>
                         </div>
                       </td>
@@ -197,14 +197,14 @@ function MedicineOrder() {
         <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden hide-scrollbar">            
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+            <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
               <div className="flex justify-between items-center">
                 <div className='flex gap-4'>
                   <h3 className="text-xl font-bold text-white">Order Details</h3>
-                  <p className="text-blue-100 text-sm mt-1">#{selectedOrder.id}</p>
+                  <p className="text-teal-100 text-sm mt-1">#{selectedOrder.id}</p>
                 </div>
                 <button
-                  className="text-white cursor-pointer bg-blue-50/20 text-gray-600 rounded-full h-8 w-8 hover:text-blue-200 transition-colors text-md font-light p-1"
+                  className="text-white cursor-pointer bg-teal-50/20 text-gray-600 rounded-full h-8 w-8 hover:text-teal-200 transition-colors text-md font-light p-1"
                   onClick={() => setSelectedOrder(null)}
                 >
                   ✕
@@ -236,7 +236,7 @@ function MedicineOrder() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-2 md:text-md text-[12px]">Total Amount</h4>
-                  <p className="md:text-md text-xs font-bold text-blue-600">
+                  <p className="md:text-md text-xs font-bold text-teal-600">
                     {formatCurrency(selectedOrder.totalAmount)}
                   </p>
                 </div>
@@ -246,30 +246,30 @@ function MedicineOrder() {
               {selectedOrder.deliveryAddress && (
                 <div className="mb-6">
                   <h4 className="md:text-md text-xs font-semibold text-gray-900 mb-3">Delivery Address</h4>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700">
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdHome className="text-blue-500" />
+                        <MdHome className="text-teal-500" />
                         {selectedOrder.deliveryAddress.houseNumber}, {selectedOrder.deliveryAddress.street}
                       </p>
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdLocationCity className="text-blue-500" />
+                        <MdLocationCity className="text-teal-500" />
                         {selectedOrder.deliveryAddress.city}
                       </p>
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdMap className="text-blue-500" />
+                        <MdMap className="text-teal-500" />
                         <span className="font-medium">Address Type:</span> {selectedOrder.deliveryAddress.addressType}
                       </p>
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdLocationCity className="text-blue-500" />
+                        <MdLocationCity className="text-teal-500" />
                         <span className="font-medium">State:</span> {selectedOrder.deliveryAddress.state}
                       </p>
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdOutlinePin className="text-blue-500" />
+                        <MdOutlinePin className="text-teal-500" />
                         {selectedOrder.deliveryAddress.postalCode}
                       </p>
                       <p className="flex items-center gap-2 md:text-md text-xs">
-                        <MdPhone className="text-blue-500" />
+                        <MdPhone className="text-teal-500" />
                         {selectedOrder.deliveryAddress.phoneNumber}
                       </p>
                     </div>

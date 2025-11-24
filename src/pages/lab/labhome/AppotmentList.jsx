@@ -1,10 +1,12 @@
 // src/pages/lab/labhome/AppotmentList.jsx
 import React, { useState } from 'react';
 import { RxStopwatch } from "react-icons/rx";
+import { useLabAuth } from '../../../Authorization/LabAuthContext';
 
 
 const AppointmentsList = ({ appointments }) => {
     console.log("list", appointments);
+    const { searchAppointment, setSearchAppointment } = useLabAuth()
     const [expandedAppointment, setExpandedAppointment] = useState(null);
 
     const getStatusColor = (status) => {
@@ -39,7 +41,7 @@ const AppointmentsList = ({ appointments }) => {
     };
 
     // Check if appointments is an array and has data
-    if (!appointments || !Array.isArray(appointments) || appointments.length === 0) {
+    if (appointments.data.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="text-center py-12">
@@ -50,16 +52,16 @@ const AppointmentsList = ({ appointments }) => {
         );
     }
 
+
     return (
-        <div className="bg-white">  
+        <div className="bg-white">
             {/* Appointments List */}
             <div className="space-y-4">
-                {appointments.map((appointment) => (
+                {appointments && appointments.data.map((appointment) => (
                     <div
                         key={appointment.id}
                         className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200"
                     >
-                        {/* Summary Card - Always Visible */}
                         <div
                             className="px-6 py-4 cursor-pointer"
                             onClick={() => toggleAccordion(appointment.id)}
@@ -99,7 +101,7 @@ const AppointmentsList = ({ appointments }) => {
 
                                 {/* Right Section - Patient Info & Action */}
                                 <div className="flex-1 mt-2 md:mt-0 md:text-right">
-                                    <div className="text-sm text-gray-600">                                       
+                                    <div className="text-sm text-gray-600">
                                         <p className="text-gray-500 ">
                                             Patient: <span className='font-bold capitalize'>{appointment.bookedFor?.name} ({appointment.bookedFor?.age || 'N/A'}{appointment.bookedFor?.gender === "Male" ? 'M' : appointment.bookedFor?.gender === "Female" ? 'F' : "O"})</span>
                                         </p>
@@ -258,14 +260,14 @@ const AppointmentsList = ({ appointments }) => {
                                 {/* Additional Actions */}
                                 <div className="mt-6 pt-4 border-t border-gray-200">
                                     <div className="flex space-x-3">
-                                        <button className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                                        {/* <button className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                                             Contact Patient
                                         </button>
                                         <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                                             Update Status
-                                        </button>
+                                        </button> */}
                                         {appointment.report?.reportUrl && appointment.report.reportUrl !== 'na' && (
-                                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                                 Download Report
                                             </button>
                                         )}

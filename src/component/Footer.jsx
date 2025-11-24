@@ -1,5 +1,6 @@
 // src/component/Footer.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Footer() {
   return (
@@ -28,9 +29,9 @@ function Footer() {
           <div>
             <h3 className="text-gray-800 font-semibold mb-3 text-sm">Legal</h3>
             <ul className="space-y-2 text-gray-600 text-sm">
-              <li><a href="#" className="hover:text-teal-700">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-teal-700">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-teal-700">Cookie Policy</a></li>
+              <li><Link to="/privacy_policy" className="hover:text-teal-700">Privacy Policy</Link></li>
+              <li><Link to="/terms_of_service" className="hover:text-teal-700">Terms of Service</Link></li>
+              <li><Link to="/return_refund_policies" className="hover:text-teal-700">Return & Refund Policies</Link></li>
             </ul>
           </div>
         </div>

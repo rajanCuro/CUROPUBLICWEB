@@ -10,6 +10,7 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 import { ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

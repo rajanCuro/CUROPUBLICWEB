@@ -13,7 +13,13 @@ import { useLabAuth } from "../../../Authorization/LabAuthContext";
 
 const LabHero = () => {
     const navigate = useNavigate();
-    const sliderImages = [heroImg, sl1, sl2];
+    const sliderImages = [
+        'https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg',
+        `https://images.pexels.com/photos/3938022/pexels-photo-3938022.jpeg`,
+        `https://images.pexels.com/photos/6629366/pexels-photo-6629366.jpeg`,
+        `https://images.pexels.com/photos/12193090/pexels-photo-12193090.jpeg`,
+        `https://images.pexels.com/photos/9574415/pexels-photo-9574415.jpeg`
+    ];
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false);
     const [uploadMode, setUploadMode] = useState("normal");
     const [searchText, setSearchText] = useState("");

@@ -5,6 +5,7 @@ import SavedAddress from "./SavedAddress";
 import MyProfile from "./Profile";
 import LabAppointmentList from "../../pages/lab/labhome/LabAppoitmentList";
 import { FiMenu, FiX } from "react-icons/fi";
+import LabReport from "../../pages/lab/labhome/LabReport";
 
 function ManageProfile() {
   const [activePage, setActivePage] = useState("profile");
@@ -104,6 +105,7 @@ function ManageProfile() {
           {activePage === "orders" && <MedicineOrder />}
           {activePage === "address" && <SavedAddress />}
           {activePage === "appointments" && <LabAppointmentList />}
+          {activePage === "reports" && <LabReport />}
         </div>
       </div>
     </div>

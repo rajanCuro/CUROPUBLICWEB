@@ -14,7 +14,7 @@ export const LabAuthProvider = ({ children }) => {
     const [screen, setScreen] = useState("Pharmacy");
     const [latitude, setLatitude] = useState(25.33297);
     const [longitude, setLongitude] = useState(82.966293);
-
+    const [searchAppointment, setSearchAppointment] = useState("");
     const [labCartItems, setLabCartItems] = useState([]);
     const [labCartLoading, setLabCartLoading] = useState(false);
     const [selectedSlots, setSelectedSlots] = useState({});
@@ -56,7 +56,8 @@ export const LabAuthProvider = ({ children }) => {
         labCartLoading,
         getAllLabCartItems,
         selectedSlots,
-        setSelectedSlots
+        setSelectedSlots,
+        searchAppointment, setSearchAppointment
     };
 
     return (

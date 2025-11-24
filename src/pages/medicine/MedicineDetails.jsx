@@ -76,7 +76,7 @@ export default function MedicineDetails() {
                             </h1>
 
                             <div className="flex items-center gap-2">
-                                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
+                                <span className="bg-teal-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
                                     4.3 ★
                                 </span>
                                 <p className="text-gray-600 text-sm">
@@ -85,11 +85,11 @@ export default function MedicineDetails() {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <p className="text-xl font-semibold text-green-600 flex items-center gap-1">
+                                <p className="text-xl font-semibold text-teal-600 flex items-center gap-1">
                                     ₹{medicine.effectiveCostPrice}
                                 </p>
                                 <p className="line-through text-gray-500 text-sm">₹363</p>
-                                <p className="text-green-600 font-medium text-sm">35% off</p>
+                                <p className="text-teal-600 font-medium text-sm">35% off</p>
                             </div>
 
                             <p className="flex items-center gap-2 text-gray-700 text-md">
@@ -118,17 +118,17 @@ export default function MedicineDetails() {
                 {/* RIGHT SECTION (Pricing Card) */}
                 <div className="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-md flex-shrink-0">
                     <div className="space-y-4">
-                        <p className="text-xl font-semibold text-green-600">
+                        <p className="text-xl font-semibold text-teal-600">
                             ₹{medicine.effectiveCostPrice}
                         </p>
                         <div className="flex gap-2">
                             <p className="line-through text-gray-500 text-sm">₹363</p>
-                            <p className="text-green-600 font-medium text-sm">35% off</p>
+                            <p className="text-teal-600 font-medium text-sm">35% off</p>
                         </div>
                         <span className="text-gray-400 text-xs">Inclusive of all taxes</span>
                         <button
                             onClick={() => handleAddtocart(medicine)}
-                            className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition"
+                            className="bg-teal-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-teal-700 transition"
                         >
                             {addingCart ? (
                                 <span className="loading loading-spinner loading-sm"></span>

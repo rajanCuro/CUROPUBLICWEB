@@ -144,11 +144,11 @@ function VisitLabSelectSlot({ labCartItems }) {
                     s.selectedSlotId &&
                     s.selectedPackageId &&
                     s.patientId
-                    // Removed address validation since it's now null
+                // Removed address validation since it's now null
             )
             .map(s => ({
                 appointmentDate: s.appointmentDate,
-                selectedSlotId: s.selectedSlotId,              
+                selectedSlotId: s.selectedSlotId,
                 selectedPackageId: s.selectedPackageId,
                 patientId: s.patientId
             }));
@@ -263,14 +263,15 @@ function VisitLabSelectSlot({ labCartItems }) {
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                <div className="mb-8 flex flex-col items-start">
+                    <h1 className="text-md md:text-3xl font-bold text-gray-900 mb-1">
                         Schedule Lab Tests
                     </h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
-                        Select time slots and patient details for your lab packages
+                    <p className="text-gray-600 text-[12px] md:text-sm">
+                        Select time slots and details for your lab packages
                     </p>
                 </div>
+
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Sidebar - Progress Summary */}

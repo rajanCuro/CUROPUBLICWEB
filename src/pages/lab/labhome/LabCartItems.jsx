@@ -136,8 +136,8 @@ function LabCartItems() {
                                 <div className="bg-gradient-to-r from-teal-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-3">
-                                            <ShoppingCart className="w-6 h-6 text-teal-600" />
-                                            <h2 className="text-xl font-semibold text-gray-900">
+                                            <ShoppingCart className="h-4 w-4 md:w-6 md:h-6 text-teal-600" />
+                                            <h2 className="text-md md:text-xl font-semibold text-gray-900">
                                                 Cart Items ({labCartItems.length})
                                             </h2>
                                         </div>
@@ -185,15 +185,10 @@ function LabCartItems() {
                                                             {/* Price and Actions */}
                                                             <div className="flex flex-col items-end gap-3">
                                                                 <div className="text-right">
-                                                                    <p className="text-2xl font-bold text-teal-600">
+                                                                    <p className="text-md md:text-2xl font-bold text-teal-600">
                                                                         ₹{item.unitPrice?.toLocaleString()}
                                                                     </p>
-                                                                    <p className="text-sm text-gray-500 mt-1">
-                                                                        per patient
-                                                                    </p>
-                                                                    <p className="text-lg font-semibold text-gray-900 mt-2">
-                                                                        Total: ₹{(item.unitPrice * item.numberOfPatients).toLocaleString()}
-                                                                    </p>
+                                                                   
                                                                 </div>
 
                                                                 <motion.button
