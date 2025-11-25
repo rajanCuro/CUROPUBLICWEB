@@ -64,7 +64,7 @@ function LabPopularPackages() {
             {/* Top Section */}
             <div className="relative">
               <img
-                src="https://privatebloodtestslondon.co.uk/wp-content/uploads/2025/08/who-is-this-package-for-blood-silver-package-image.jpg"
+                src="https://images.pexels.com/photos/7722852/pexels-photo-7722852.jpeg"
                 alt="Package"
                 className="w-full h-32 md:h-36 object-cover group-hover:scale-105 transition-transform duration-300"
               />

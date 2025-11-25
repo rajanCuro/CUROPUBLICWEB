@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../../component/Loader";
 
 function MedicineProductBySubCategory({ productList = [], loading }) {
-    const { userData, getAllMedicineCartItems } = useAuth();
+    const { userData, getAllMedicineCartItems, setAuthModal } = useAuth();
     const [addingCartId, setAddingCartId] = useState(null);
     const navigate = useNavigate();
     const userId = userData?.id;
@@ -14,6 +14,10 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
     console.log("product list", productList);
 
     const handleAddtocart = async (item) => {
+        if (!userId) {
+            setAuthModal(true);
+            return;
+        }
         try {
             setAddingCartId(item?.pharmacyMedicineBatch?.id);
             const response = await axiosInstance.post(
@@ -28,7 +32,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
         }
     };
 
-    
+
 
 
 
@@ -65,7 +69,7 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                         </p>
 
                         <div className="mt-2">
-                            <p className="text-green-700 font-semibold text-sm md:text-lg">
+                            <p className="text-teal-700 font-semibold text-sm md:text-lg">
                                 ₹{item?.pharmacyMedicineBatch?.effectiveCostPrice}
                             </p>
 
@@ -80,8 +84,8 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                                 e.stopPropagation();
                                 handleAddtocart(item);
                             }}
-                            className="mt-2 bg-green-500 text-white px-2 md:px-4 py-1 rounded-md hover:bg-green-600 transition text-xs md:text-md"
-                        >
+                            className="mt-2 bg-teal-500 text-white px-2 md:px-4 py-2 rounded-md hover:bg-teal-600 transition text-xs md:text-md"
+                         >
                             {addingCartId === item?.pharmacyMedicineBatch?.id ? (
                                 <span className="loading loading-spinner loading-sm"></span>
                             ) : (

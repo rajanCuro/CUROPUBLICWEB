@@ -41,7 +41,6 @@ const placeholders = [
   "Search for vitamins...",
   "Search for health products...",
 ];
-π
 const Header = () => {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
