@@ -1,25 +1,26 @@
 // src/pages/medicine/MedicneSUbcategoryProduct.jsx
 // src/pages/medicine/MedicneSubcategoryProduct.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axiosInstance from "../../Authorization/axiosInstance";
 import MedicineProductBySubCategory from "./MedicineProductBySubCategory";
 import { useAuth } from "../../Authorization/AuthContext";
 import SimilarMedicineProduct from "./SimilarMedicineProduct";
-
+import NewArrivalsMedicine from "./NewArrivalsMedicine";
+import { BreadCrumb } from 'primereact/breadcrumb';
 function MedicneSubcategoryProduct() {
     const { id } = useParams(); // category ID
     const { latitude, longitude } = useAuth();
     const [fetching, setFetching] = useState(false)
-
     const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
     const [distance] = useState(1200);
     const [productList, setProductList] = useState([]);
     const [subCatName, setSubCatName] = useState("");
     const [activeIndex, setActiveIndex] = useState(0);
+    const items = [{ label: 'Pharmacy' }];
+    const home = { icon: 'pi pi-home', url: '/' }
 
     // Fetch categories on mount
     useEffect(() => {
@@ -76,6 +77,14 @@ function MedicneSubcategoryProduct() {
             {error && <p className="text-red-500">{error}</p>}
 
             {/* Selected Subcategory Name */}
+            {/* <BreadCrumb model={items} home={home} /> */}
+            <div className="breadcrumbs text-sm">
+                <ul>
+                    <li><Link to='/medicine/delivery'>Home</Link></li>
+                    <li><a>{subCatName}</a></li>
+
+                </ul>
+            </div>
             <div className="border-b border-gray-200 py-3">
                 <p className="text-center capitalize font-bold">{`${subCatName}`}</p>
             </div>
@@ -110,15 +119,29 @@ function MedicneSubcategoryProduct() {
                 </div>
 
                 {/* Product List */}
-                <div className="  w-full">
-                    {
-                        productList.length === 0 && !fetching && (
-                            <div className="flex h-[40vh]  items-center justify-center mt-10">
-                                <p className="text-gray-400 text-lg italic">No products available in this subcategory.</p>
-                            </div>
-                        )}
-                    <MedicineProductBySubCategory productList={productList} loading={fetching} />
+                <div className="w-full">
+                    {/* Loader When Fetching */}
+                    {fetching && (
+                        <div className="flex h-[40vh] items-center justify-center">
+                            <span className="loading loading-spinner loading-lg text-teal-600"></span>
+                        </div>
+                    )}
+
+                    {/* No data when finished fetching */}
+                    {!fetching && productList.length === 0 && (
+                        <div className="flex h-[40vh] items-center justify-center">
+                            <p className="text-gray-400 text-lg italic">
+                                No products available in this subcategory.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Product List */}
+                    {!fetching && (
+                        <MedicineProductBySubCategory productList={productList} loading={fetching} />
+                    )}
                 </div>
+
 
             </div>
 
@@ -128,6 +151,7 @@ function MedicneSubcategoryProduct() {
                 <p className="text-gray-500 mt-4">No subcategories found.</p>
             )}
             <SimilarMedicineProduct name={subCatName ?? "Headache"} />
+            <NewArrivalsMedicine />
 
         </div>
     );

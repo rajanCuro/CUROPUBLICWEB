@@ -1,3 +1,4 @@
+// src/component/Testomonial.jsx
 // src/component/Testimonial.jsx
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -290,15 +291,15 @@ function Testimonial() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
-                    >
+                        className="text-md md:text-2xl font-bold text-gray-900 mb-4"
+                     >
                         What Our Patients Say
                     </motion.h2>
                     <motion.p 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-xl text-gray-600 max-w-3xl mx-auto"
+                        className="text-[14px] text-gray-600 max-w-3xl mx-auto"
                     >
                         Trusted by thousands of patients across Varanasi for accurate diagnostics and exceptional healthcare services
                     </motion.p>

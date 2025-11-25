@@ -1,3 +1,4 @@
+// src/pages/lab/labhome/LabReport.jsx
 // src/pages/lab/LabReport.jsx
 
 import React, { useEffect, useState } from "react";
@@ -113,17 +114,26 @@ function LabReport() {
 
     const getStatusOptions = () => [...new Set(reports.map((i) => i.status).filter(Boolean))];
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center w-full py-20">
+                <div className="relative">
+                    <span className="loading loading-spinner loading-md"></span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="">
             <div className="">
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Lab Reports</h1>
-                <p className="text-gray-600 mb-6">Access and manage your laboratory test results</p>
+                <h1 className=" text-md md:text-2xl font-bold text-gray-900 mb-2">Lab Reports</h1>
+                <p className="text-gray-600 mb-6 text-sm">Access and manage your laboratory test results</p>
 
                 {/* Filters */}
                 <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
                         <input
                             type="text"
                             placeholder="Search by Patient or Report ID"
@@ -162,77 +172,97 @@ function LabReport() {
                                 className="border px-3 py-2 rounded-md text-sm"
                             />
                         )}
+                        <button
+                            onClick={clearFilters}
+                            className=" px-4 py-2 bg-gray-200 rounded text-sm cursor-pointer hover:bg-gray-300 transition"
+                        >
+                            Clear Filters
+                        </button>
                     </div>
 
-                    <button
-                        onClick={clearFilters}
-                        className="mt-3 px-4 py-2 bg-gray-200 rounded text-sm"
-                    >
-                        Clear Filters
-                    </button>
+
                 </div>
 
                 {/* Table */}
                 <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-12 px-6 py-4 bg-gray-50 border-b text-xs font-semibold text-gray-600">
-                        <div className="col-span-2">Report ID</div>
-                        <div className="col-span-2">Patient</div>
-                        <div className="col-span-2">Date</div>
-                        <div className="col-span-3">Status</div>
+
+                    {/* Table Header - hidden on mobile */}
+                    <div className="hidden md:grid grid-cols-12 px-6 py-3 bg-gray-50 border-b text-xs font-semibold text-gray-600">
+                        <div className="col-span-1">SN</div>
+                        <div className="col-span-3">Patient</div>
+                        <div className="col-span-3">Date</div>
+                        <div className="col-span-2">Status</div>
                         <div className="col-span-3 text-center">Actions</div>
                     </div>
 
                     <div className="divide-y divide-gray-200">
-                        {[...filteredReports].reverse().map((item) => {
+                        {[...filteredReports].reverse().map((item, index) => {
                             const statusVariant = getStatusVariant(item.status);
+
                             return (
-                                <div key={item.id} className="grid grid-cols-12 px-6 py-4 hover:bg-gray-50">
+                                <div
+                                    key={item.id}
+                                    className="px-4 md:px-6 py-3 hover:bg-gray-50 text-xs md:text-sm
+                     grid grid-cols-1 md:grid-cols-12 gap-2"
+                                >
+                                    {/* SN */}
+                                    <div className="font-mono md:col-span-1 text-[11px] md:text-sm">
+                                        #{index + 1}
+                                    </div>
 
-                                    <div className="col-span-2 font-mono text-sm">#{item.id}</div>
-
-                                    <div className="col-span-2 text-gray-900 font-medium">
+                                    {/* Patient */}
+                                    <div className="text-gray-900 font-medium md:col-span-3">
                                         {item.patientDetail?.name}
-                                        <span className="text-sm text-gray-600">
+                                        <span className="ml-1 text-gray-600 text-[11px] md:text-sm">
                                             ({item.patientDetail?.age} {item.patientDetail?.gender?.charAt(0)})
                                         </span>
                                     </div>
 
-                                    <div className="col-span-2 text-sm text-gray-700 flex items-center">
+                                    {/* Date */}
+                                    <div className="flex items-center text-gray-700 md:col-span-3">
                                         {formatDate(item.updatedAt)}
                                         {isToday(item.updatedAt) && (
-                                            <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-1 rounded">Today</span>
+                                            <span className="ml-2 text-[10px] bg-blue-100 text-blue-800 px-1 rounded">
+                                                Today
+                                            </span>
                                         )}
                                         {isYesterday(item.updatedAt) && (
-                                            <span className="ml-2 text-xs bg-gray-100 text-gray-800 px-1 rounded">Yesterday</span>
+                                            <span className="ml-2 text-[10px] bg-gray-100 text-gray-800 px-1 rounded">
+                                                Yesterday
+                                            </span>
                                         )}
                                     </div>
 
-                                    <div className="col-span-3 flex items-center space-x-2">
+                                    {/* Status */}
+                                    <div className="flex items-center space-x-2 md:col-span-2">
                                         <span className={`w-2 h-2 rounded-full ${statusVariant.dot}`}></span>
-                                        <span className={`text-xs px-2 py-1 rounded-full ${statusVariant.bg}`}>
+                                        <span className={`text-[10px] md:text-xs px-2 py-1 rounded-full ${statusVariant.bg}`}>
                                             {item.status}
                                         </span>
                                     </div>
 
-                                    <div className="col-span-3 flex justify-center space-x-2">
+                                    {/* Actions */}
+                                    <div className="flex flex-col md:flex-row space-y-1 md:space-y-0 md:space-x-2 md:col-span-3">
                                         {item.reportUrl ? (
                                             <>
                                                 <button
                                                     onClick={() => setSelectedReport(item)}
-                                                    className="px-3 py-1 border rounded text-xs"
+                                                    className="px-3 py-1 border rounded text-[10px] md:text-xs"
                                                 >
                                                     View
                                                 </button>
                                                 <a
                                                     href={item.reportUrl}
                                                     target="_blank"
-                                                    className="px-3 py-1 text-xs bg-teal-600 text-white rounded"
+                                                    className="px-3 py-1 bg-teal-600 text-white rounded text-[10px] md:text-xs"
                                                 >
                                                     Download
                                                 </a>
                                             </>
                                         ) : (
-                                            <span className="text-xs text-gray-500 italic">Report in Progress</span>
+                                            <span className="text-[10px] text-gray-500 italic">
+                                                Report in Progress
+                                            </span>
                                         )}
                                     </div>
                                 </div>
@@ -240,6 +270,7 @@ function LabReport() {
                         })}
                     </div>
                 </div>
+
 
                 {selectedReport && (
                     <div

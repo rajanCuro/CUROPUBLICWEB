@@ -5,9 +5,10 @@ import SimilarMedicineProduct from "./SimilarMedicineProduct";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
 import { toast } from "react-toastify";
+import { MdErrorOutline } from "react-icons/md";
 
 function SubCategoryMedicineDetails() {
-    const { getAllMedicineCartItems, userData } = useAuth()
+    const { getAllMedicineCartItems, userData, allmedicineIncart } = useAuth()
     const userId = userData?.id
     const { state } = useLocation();
     const data = state?.medicineList;
@@ -24,6 +25,11 @@ function SubCategoryMedicineDetails() {
         );
     }
 
+    // console.log("fj", allmedicineIncart)
+    const isInCart = (batchId) =>
+        allmedicineIncart?.some(
+            (cartItem) => cartItem?.medicineBatch?.id === batchId
+        );
     const handleAddtocart = async (item) => {
         console.log("item", item.pharmacyMedicineBatch.id)
         try {
@@ -135,6 +141,13 @@ function SubCategoryMedicineDetails() {
 
                 {/* RIGHT SECTION – ADD TO CART CARD */}
                 <div className="bg-white rounded-xl p-6 shadow-sm  sticky top-10">
+                    {!medicine.medicine?.otc && (
+                        <p className="text-red-500 flex items-center gap-1 mt-2 text-sm font-semibold">
+                            <MdErrorOutline size={18} />
+                            Prescription Required Medicine
+                        </p>
+                    )}
+
                     <p className="text-teal-600 text-2xl font-bold">
                         ₹{medicine?.unitPrice}
                     </p>
@@ -151,15 +164,17 @@ function SubCategoryMedicineDetails() {
                     </p>
 
                     {/* Add to Cart */}
-                    <button
-                        onClick={() => handleAddtocart(data)}
-                        className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
-                    >
-                        {addingCart ? <span className="loading loading-spinner loading-sm"></span> : "Add to cart"}
-                    </button>
+                    {!medicine.medicine?.otc ?
+                        <button disabled className="mt-5 w-full disabled:cursor-not-allowed bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition">Prescription required</button>
+                        : <button
+                            onClick={() => handleAddtocart(data)}
+                            className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
+                        >
+                            {addingCart ? <span className="loading loading-spinner loading-sm"></span> : "Add to cart"}
+                        </button>}
                 </div>
             </div>
-            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor} />
+            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || medicine.medicine?.name} />
         </div>
     );
 }

@@ -445,7 +445,7 @@ const Header = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="card flex justify-content-center border">
+      <div className="card flex justify-content-center ">
         <Sidebar
           visible={visible}
           onHide={() => setVisible(false)}
