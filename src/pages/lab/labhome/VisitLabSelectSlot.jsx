@@ -193,7 +193,7 @@ function VisitLabSelectSlot({ labCartItems }) {
         return (
             <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-3">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
                     <span className="text-sm font-medium text-gray-700">All details selected</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -230,7 +230,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                         <React.Fragment key={step.key}>
                             <div className="flex flex-col items-center">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-medium transition-all duration-300 ${index < currentIndex
-                                    ? "bg-green-600 text-white"
+                                    ? "bg-teal-600 text-white"
                                     : index === currentIndex
                                         ? "bg-teal-600 text-white ring-2 ring-teal-200"
                                         : "bg-gray-100 text-gray-400 border border-gray-300"
@@ -243,7 +243,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                 </span>
                             </div>
                             {index < steps.length - 1 && (
-                                <div className={`flex-1 h-1 mx-4 rounded-full transition-all duration-300 ${index < currentIndex ? "bg-green-500" : "bg-gray-200"
+                                <div className={`flex-1 h-1 mx-4 rounded-full transition-all duration-300 ${index < currentIndex ? "bg-teal-500" : "bg-gray-200"
                                     }`} />
                             )}
                         </React.Fragment>
@@ -289,7 +289,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
-                                            className="bg-green-600 h-2 rounded-full transition-all duration-500"
+                                            className="bg-teal-600 h-2 rounded-full transition-all duration-500"
                                             style={{ width: `${(completedPackagesCount / labCartItems.length) * 100}%` }}
                                         ></div>
                                     </div>
@@ -344,7 +344,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                         className={`bg-white rounded-lg shadow-sm border transition-all duration-200 ${isActive
                                             ? 'ring-2 ring-teal-500 border-teal-300'
                                             : completed
-                                                ? 'border-green-200'
+                                                ? 'border-teal-200'
                                                 : 'border-gray-200'
                                             }`}
                                     >
@@ -354,7 +354,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                 <div className="flex-1">
                                                     <div className="flex items-start gap-4 mb-3">
                                                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold ${completed
-                                                            ? 'bg-green-600'
+                                                            ? 'bg-teal-600'
                                                             : 'bg-gray-600'
                                                             }`}>
                                                             {index + 1}
@@ -365,7 +365,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                     {pkg.labPackage.packageName}
                                                                 </h3>
                                                                 {completed && (
-                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200">
                                                                         Scheduled
                                                                     </span>
                                                                 )}
@@ -373,7 +373,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                             <div className="flex flex-wrap gap-4 text-sm">
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="font-medium text-gray-700">Price:</span>
-                                                                    <span className="text-green-700 font-semibold">₹{pkg.unitPrice}</span>
+                                                                    <span className="text-teal-700 font-semibold">₹{pkg.unitPrice}</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="font-medium text-gray-700">Lab:</span>
@@ -386,14 +386,14 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => onClickPackage(pkg)}
-                                                        className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors border ${isActive
+                                                        className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors border cursor-pointer ${isActive
                                                             ? "bg-teal-50 text-teal-700 border-teal-300"
                                                             : completed
                                                                 ? "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                                                                 : "bg-teal-600 text-white border-teal-600 hover:bg-teal-700"
                                                             }`}
                                                     >
-                                                        {isActive ? "Editing..." : completed ? "Edit" : "Select"}
+                                                        {isActive ? "Editing..." : completed ? "Edit" : "Select Patient & Slot"}
                                                     </button>
                                                 </div>
                                             </div>
@@ -447,7 +447,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                             key={slot.id}
                                                                             onClick={() => onSelectSlot(slot)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${isChosen
-                                                                                ? "border-green-500 bg-green-50 ring-1 ring-green-200"
+                                                                                ? "border-teal-500 bg-teal-50 ring-1 ring-teal-200"
                                                                                 : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
@@ -456,7 +456,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                                     {slot.startAt} - {slot.endAt}
                                                                                 </div>
                                                                                 {isChosen && (
-                                                                                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                                                    <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
                                                                                         <span className="text-white text-xs">✓</span>
                                                                                     </div>
                                                                                 )}
@@ -492,7 +492,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                             key={fm.id}
                                                                             onClick={() => onSelectFamily(fm)}
                                                                             className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                                                                ? "border-green-500 bg-green-50 ring-1 ring-green-200"
+                                                                                ? "border-teal-500 bg-teal-50 ring-1 ring-teal-200"
                                                                                 : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
                                                                                 }`}
                                                                         >
@@ -501,7 +501,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                                     {fm.name}
                                                                                 </div>
                                                                                 {chosen && (
-                                                                                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                                                    <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
                                                                                         <span className="text-white text-xs">✓</span>
                                                                                     </div>
                                                                                 )}

@@ -28,6 +28,33 @@ function LabPackageDetails() {
 
     const { labPackage, distance, latitude, longitude } = item;
     const discountedPrice = labPackage?.price * (1 - labPackage?.discount / 100);
+    // Mask phone → +91-xxxxxxx97
+    const maskPhone = (phone) => {
+        if (!phone) return "";
+        const lastTwo = phone.slice(-2);
+        return `+91-xxxxxxx${lastTwo}`;
+    };
+
+    // Mask email → s*****t@domain.com
+    const maskEmail = (email) => {
+        if (!email) return "";
+
+        const [name, domain] = email.split("@");
+        if (!domain) return email;
+
+        if (name.length <= 2) {
+            return name[0] + "*****@" + domain;
+        }
+
+        return (
+            name[0] +
+            "*".repeat(name.length - 2) +
+            name[name.length - 1] +
+            "@" +
+            domain
+        );
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -151,16 +178,18 @@ function LabPackageDetails() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                                     <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
                                         <Phone size={16} />
-                                        <span className="break-all">{labPackage?.lab?.mobileNumber}</span>
+                                        <span className="break-all">{maskPhone(labPackage?.lab?.mobileNumber)}</span>
                                     </div>
+
                                     <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
                                         <Mail size={16} />
-                                        <span className="break-all">{labPackage?.lab?.email}</span>
+                                        <span className="break-all">{maskEmail(labPackage?.lab?.email)}</span>
                                     </div>
-                                    <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
+
+                                    {/* <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
                                         <MapPin size={16} />
                                         <span className="break-words">Lat {latitude}, Long {longitude}</span>
-                                    </div>
+                                    </div> */}
                                     <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
                                         <Clock size={16} />
                                         <span>{labPackage?.lab?.operatingHours || "Standard Hours"}</span>
