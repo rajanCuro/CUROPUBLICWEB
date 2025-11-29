@@ -5,7 +5,7 @@ import { useAuth } from "../Authorization/AuthContext";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix for default markers in react-leaflet
+// Fix Leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Custom icon for better appearance
+// Custom Icon
 const customIcon = new L.Icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -21,25 +21,29 @@ const customIcon = new L.Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [41, 41],
 });
 
-const containerStyle = {
-  width: "100%",
-  height: "400px",
-};
+// ⛳ Your LocationIQ Key
+// const LOCATIONIQ_KEY = "AIzaSyDQhTx-hV6s2j1v9YL9ewHJwJpTiFhdj00";
+const LOCATIONIQ_KEY = "pk.7895d307bfb8f6331b3a11da8ac5403f";
 
 function Map() {
   const { latitude, setLatitude, longitude, setLongitude } = useAuth();
+
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
   const [map, setMap] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const markerRef = useRef(null);
 
-  // 📍 Get user current location on component load
+  // ⭐ Load initial location
   useEffect(() => {
+    setIsLoading(true);
+
     if (!latitude || !longitude) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -47,87 +51,63 @@ function Map() {
           setLatitude(latitude);
           setLongitude(longitude);
           setSelectedLocation([latitude, longitude]);
-          reverseGeocodeWithOSM(latitude, longitude);
+          reverseGeocode(latitude, longitude);
+          setIsLoading(false);
         },
-        (err) => {
-          setError("Location access denied. Using default location.");
-          // Set default location if geolocation fails
-          const defaultLocation = [28.6139, 77.2090]; // Delhi, India
-          setSelectedLocation(defaultLocation);
+        () => {
+          const defaultLocation = [28.6139, 77.2090]; // Delhi
           setLatitude(defaultLocation[0]);
           setLongitude(defaultLocation[1]);
-          reverseGeocodeWithOSM(defaultLocation[0], defaultLocation[1]);
+          setSelectedLocation(defaultLocation);
+          reverseGeocode(defaultLocation[0], defaultLocation[1]);
+          setIsLoading(false);
         }
       );
     } else {
       setSelectedLocation([latitude, longitude]);
-      reverseGeocodeWithOSM(latitude, longitude);
+      reverseGeocode(latitude, longitude);
+      setIsLoading(false);
     }
-  }, [latitude, longitude, setLatitude, setLongitude]);
+  }, []);
 
-  // 🌍 Reverse Geocode via OpenStreetMap
-  const reverseGeocodeWithOSM = async (lat, lng) => {
+  // ⭐ Reverse Geocoding (LocationIQ)
+  const reverseGeocode = async (lat, lng) => {
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-      
-      const res = await fetch(url);
+      const res = await fetch(
+        `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_KEY}&lat=${lat}&lon=${lng}&format=json`
+      );
+
       const data = await res.json();
-      
-      if (data && data.address) {
-        formatAddress(data.address);
-      } else {
-        setAddress("Address not found");
-      }
-    } catch (err) {
-      console.error("Geocoding error:", err);
-      setAddress("Unable to fetch address");
+      console.log("address Data",data)
+      if (data?.display_name) setAddress(data.display_name);
+      else setAddress("Address not available");
+    } catch (e) {
+      setAddress("Address not available");
     }
   };
 
-  // Format OSM address into custom string
-  const formatAddress = (addr) => {
-    if (!addr) {
-      setAddress("No address information available");
-      return;
-    }
-
-    const formatted = [
-      addr.house_number,
-      addr.road,
-      addr.neighbourhood,
-      addr.suburb,
-      addr.city || addr.town || addr.village,
-      addr.state,
-      addr.postcode,
-      addr.country,
-    ]
-      .filter(Boolean)
-      .join(", ");
-
-    setAddress(formatted || "Address format not available");
-  };
-
-  // 🖱 Map click handler
+  // ⭐ Map Click
   const handleMapClick = (e) => {
-    const { lat, lng } = e.latlng;
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
     setSelectedLocation([lat, lng]);
     setLatitude(lat);
     setLongitude(lng);
-    reverseGeocodeWithOSM(lat, lng);
+    reverseGeocode(lat, lng);
   };
 
-  // 🎯 Marker drag end handler
+  // ⭐ Marker Drag
   const handleMarkerDragEnd = (e) => {
-    const marker = e.target;
-    const position = marker.getLatLng();
-    setSelectedLocation([position.lat, position.lng]);
-    setLatitude(position.lat);
-    setLongitude(position.lng);
-    reverseGeocodeWithOSM(position.lat, position.lng);
+    const pos = e.target.getLatLng();
+    setSelectedLocation([pos.lat, pos.lng]);
+    setLatitude(pos.lat);
+    setLongitude(pos.lng);
+    reverseGeocode(pos.lat, pos.lng);
   };
 
-  // 🔍 Manual address search handler
-  const handleAddressSearch = async (e) => {
+  // ⭐ Address Search (LocationIQ)
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (!address.trim()) return;
 
@@ -135,209 +115,122 @@ function Map() {
     setError("");
 
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-      
-      const res = await fetch(url);
+      const res = await fetch(
+        `https://us1.locationiq.com/v1/search?key=${LOCATIONIQ_KEY}&q=${address}&format=json`
+      );
+
       const data = await res.json();
 
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        const newLocation = [parseFloat(lat), parseFloat(lon)];
-        setSelectedLocation(newLocation);
-        setLatitude(newLocation[0]);
-        setLongitude(newLocation[1]);
-        
-        if (map) {
-          map.setView(newLocation, 16);
-        }
-        
-        // Get the full address for the selected location
-        reverseGeocodeWithOSM(newLocation[0], newLocation[1]);
+      if (data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+
+        setSelectedLocation([lat, lng]);
+        setLatitude(lat);
+        setLongitude(lng);
+
+        reverseGeocode(lat, lng);
+
+        if (map) map.setView([lat, lng], 16);
       } else {
-        setError("Address not found. Please try a different search term.");
+        setError("Address not found.");
       }
-    } catch (err) {
-      console.error("Search error:", err);
-      setError("Error searching for address. Please try again.");
     } finally {
       setIsSearching(false);
     }
   };
 
-  // 📍 Use Current Location handler
+  // ⭐ Use Device Location
   const handleUseCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+
         setSelectedLocation([latitude, longitude]);
         setLatitude(latitude);
         setLongitude(longitude);
-        if (map) {
-          map.setView([latitude, longitude], 16);
-        }
-        reverseGeocodeWithOSM(latitude, longitude);
-        setError("");
+        reverseGeocode(latitude, longitude);
+
+        if (map) map.setView([latitude, longitude], 16);
       },
-      (err) => {
-        setError("Unable to get current location. Please check your location permissions.");
+      () => {
+        setError("Unable to get current location.");
       }
     );
   };
 
-  // Map events component
   function MapEvents() {
-    useMapEvents({
-      click: handleMapClick,
-    });
+    useMapEvents({ click: handleMapClick });
     return null;
   }
 
-  if (!selectedLocation) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <p>Loading map...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
-        <h2 className="text-xl font-semibold text-white">Location Selection</h2>
-        <p className="text-teal-100 text-sm mt-1">Select your delivery location on the map</p>
-      </div>
+    <div className="p-4">
 
-      {/* Search Section */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex flex-col sm:flex-row gap-3 mb-3">
-          <div className="flex-1">
-            <label htmlFor="address-search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search Address
-            </label>
-            <form onSubmit={handleAddressSearch} className="flex gap-2">
-              <input
-                id="address-search"
-                type="text"
-                placeholder="Enter full address (street, city, postal code)"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-              >
-                {isSearching ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Searching</span>
-                  </div>
-                ) : (
-                  "Search"
-                )}
-              </button>
-            </form>
-          </div>
-          <button
-            onClick={handleUseCurrentLocation}
-            className="px-4 py-3 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors font-medium whitespace-nowrap mt-7 sm:mt-0"
-          >
-            📍 Current Location
-          </button>
-        </div>
-        
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-3 rounded-lg border border-red-200">
-            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-      </div>
+      {/* Search Box */}
+      <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+        <input
+          type="text"
+          className="border px-3 py-2 w-full rounded"
+          placeholder="Search location"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="bg-teal-600 text-white px-4 py-2 rounded"
+          disabled={isSearching}
+        >
+          {isSearching ? "Searching..." : "Search"}
+        </button>
+      </form>
 
-      {/* Map Container */}
-      <div className="p-6">
-        <div className="rounded-lg overflow-hidden border border-gray-300 shadow-sm">
-          <MapContainer
-            center={selectedLocation}
-            zoom={14}
-            style={containerStyle}
-            whenCreated={setMap}
-            className="w-full"
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <MapEvents />
-            <Marker
-              position={selectedLocation}
-              draggable={true}
-              eventHandlers={{
-                dragend: handleMarkerDragEnd,
-              }}
-              icon={customIcon}
-              ref={markerRef}
-            >
-              <Popup className="custom-popup">
-                <div className="text-sm min-w-[200px]">
-                  <h3 className="font-semibold text-gray-900 mb-2">Selected Location</h3>
-                  <div className="space-y-1">
-                    <p className="text-gray-600">
-                      <span className="font-medium">Lat:</span> {selectedLocation[0]?.toFixed(6)}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-medium">Lng:</span> {selectedLocation[1]?.toFixed(6)}
-                    </p>
-                    <p className="text-gray-600 mt-2">
-                      <span className="font-medium">Address:</span> {address}
-                    </p>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          </MapContainer>
-        </div>
+      <button
+        className="mb-4 border px-4 py-2 rounded text-teal-600 border-teal-600"
+        onClick={handleUseCurrentLocation}
+      >
+        Use Current Location
+      </button>
 
-        {/* Location Details */}
-        <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Selected Location Details
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      {error && (
+        <div className="text-red-600 mb-3">{error}</div>
+      )}
+
+      {/* Map */}
+      <MapContainer
+        center={selectedLocation}
+        zoom={14}
+        style={{ height: "400px", width: "100%" }}
+        whenCreated={setMap}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        <MapEvents />
+
+        <Marker
+          position={selectedLocation}
+          draggable={true}
+          icon={customIcon}
+          eventHandlers={{ dragend: handleMarkerDragEnd }}
+          ref={markerRef}
+        >
+          <Popup>
             <div>
-              <p className="text-gray-500 font-medium">Latitude</p>
-              <p className="text-gray-900 font-mono">{selectedLocation[0]?.toFixed(6)}</p>
+              <strong>Latitude:</strong> {selectedLocation[0]}<br />
+              <strong>Longitude:</strong> {selectedLocation[1]}<br />
+              <strong>Address:</strong> {address}
             </div>
-            <div>
-              <p className="text-gray-500 font-medium">Longitude</p>
-              <p className="text-gray-900 font-mono">{selectedLocation[1]?.toFixed(6)}</p>
-            </div>
-            <div className="md:col-span-1">
-              <p className="text-gray-500 font-medium">Full Address</p>
-              <p className="text-gray-900">{address}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Click on the map or drag the marker to set your precise location</span>
-        </div>
-      </div>
+          </Popup>
+        </Marker>
+      </MapContainer>
     </div>
   );
 }

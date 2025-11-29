@@ -44,7 +44,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
+  const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData, latitude, longitude } = useAuth();
   const { screen, setScreen, getAllLabCartItems, labCartItems } = useLabAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,7 +53,8 @@ const Header = () => {
   const searchRef = useRef(null);
   const currentPath = location.pathname;
   const [visible, setVisible] = useState(false);
-
+  // console.log("lat",latitude)
+  // console.log("lan",longitude)
   useEffect(() => {
     const interval = setInterval(() => {
       setPlaceholderIndex((prev) =>
@@ -151,7 +152,7 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
       {/* Top Bar */}
-     
+
 
       {/* Main Navigation */}
       <nav className=" mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,7 +249,7 @@ const Header = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => screen === "Pharmacy" ? navigate('/medicine/cart') : navigate('/lab_cartitems')}
               className="relative p-2 text-gray-600 hover:text-teal-600 transition-colors group"
-             >
+            >
               <div className="relative">
                 <FiShoppingCart size={22} />
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm">

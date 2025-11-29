@@ -22,35 +22,35 @@ function OurServices() {
             title: "Lab Tests",
             description: "Book diagnostic tests and get results online.",
             icon: <GiMicroscope />,
-            path: '/medicine/delivery'
+            path: '/lab'
         },
         {
             id: 3,
             title: "Doctor Consultation",
             description: "Consult with experienced doctors online.",
             icon: <FaUserDoctor />,
-            path: '/medicine/delivery'
+            path: '/doctor'
         },
         {
             id: 4,
             title: "Ambulance",
             description: "Request emergency medical transport.",
             icon: <FaAmbulance />,
-            path: '/medicine/delivery'
+            path: '/ambulance'
         },
         {
             id: 5,
             title: "Hospitals",
             description: "Find the nearest hospital and receive reliable care.",
             icon: <RiHospitalFill />,
-            path: '/medicine/delivery'
+            path: '/'
         },
         {
             id: 6,
             title: "Emergency Services",
             description: "Dispatch medical help instantly—fast, reliable, 24/7.",
             icon: <RiAlertFill />,
-            path: '/medicine/delivery'
+            path: '/'
         }
     ];
 

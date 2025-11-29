@@ -1,5 +1,5 @@
 // src/pages/ambulance/ambulanceHome/AmbulanceHome.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     FaAmbulance,
     FaPhone,
@@ -18,6 +18,12 @@ import {
 } from 'react-icons/gi';
 
 function AmbulanceHome() {
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }, [])
     const upcomingFeatures = [
         {
             id: 1,
@@ -168,7 +174,7 @@ function AmbulanceHome() {
                     </div>
                 </div>
 
-               
+
 
                 {/* Floating Notification Button */}
                 <div className="fixed bottom-6 right-6">

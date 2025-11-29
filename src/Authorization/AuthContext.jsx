@@ -11,14 +11,18 @@ export const AuthProvider = ({ children }) => {
   const [authModal, setAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [latitude, setLatitude] = useState(25.33297); //25.33297
-  const [longitude, setLongitude] = useState(82.966293); // 82.966293
+  // const [latitude, setLatitude] = useState(25.33297); //25.33297
+  // const [longitude, setLongitude] = useState(82.966293); // 82.966293
+
+  const [latitude, setLatitude] = useState(null); //25.33297
+  const [longitude, setLongitude] = useState(null); // 82.966293
 
   const [allmedicineIncart, setAllMedicineInCart] = useState([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
     const storedToken = localStorage.getItem("token");
+    
 
 
     let parsedUser = null;

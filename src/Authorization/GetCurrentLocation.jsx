@@ -1,24 +1,34 @@
+// src/Authorization/GetCurrentLocation.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 function GetCurrentLocation() {
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
+
   const { setLatitude, setLongitude, latitude, longitude } = useAuth();
 
   useEffect(() => {
+    // CASE 1: If latitude & longitude already available in AuthContext → no need to ask location again
+    if (latitude && longitude) {
+      reverseGeocodeWithOSM(latitude, longitude);
+      return;
+    }
+
+    // CASE 2: If not available → ask browser for location
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
         setLatitude(lat);
         setLongitude(lng);
+
         reverseGeocodeWithOSM(lat, lng);
       },
       (err) => {
@@ -26,7 +36,7 @@ function GetCurrentLocation() {
         setError("Unable to retrieve your location.");
       }
     );
-  }, []);
+  }, [latitude, longitude]); // re-run when context values change
 
   const reverseGeocodeWithOSM = async (lat, lng) => {
     try {
@@ -41,7 +51,7 @@ function GetCurrentLocation() {
       );
 
       const data = await response.json();
-      console.log("Reverse Geocoding Data", data);
+      console.log("Reverse Geocoding Data:", data);
 
       if (!data || !data.address) {
         throw new Error("Invalid address response");
@@ -70,7 +80,7 @@ function GetCurrentLocation() {
   };
 
   return (
-    <div className="p-4">  
+    <div className="p-4">
       {address ? (
         <p className="text-gray-600 text-sm mt-2">{address}</p>
       ) : (

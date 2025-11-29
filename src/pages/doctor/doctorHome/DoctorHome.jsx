@@ -1,9 +1,15 @@
 // src/pages/doctor/doctorHome/DoctorHome.jsx
 // src/pages/lab/doctor/doctorHome/DoctorHome.jsx
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 function DoctorHome() {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }, [])
   const upcomingFeatures = [
     {
       id: 1,

@@ -255,10 +255,12 @@ const Hero = () => {
                                         repeat: Infinity,
                                         ease: "easeInOut"
                                     }}
-                                >
+                                 >
                                     <div className="text-center">
-                                        <div className="text-sm font-bold">500+</div>
-                                        <div className="text-xs">Doctors Online</div>
+                                        {/* <div className="text-sm font-bold">500+</div>
+                                        <div className="text-xs">Doctors Online</div> */}
+                                        <div className="text-sm font-bold">Curo24</div>
+                                        {/* <div className="text-xs">24</div> */}
                                     </div>
                                 </motion.div>
                             </motion.div>
@@ -270,12 +272,12 @@ const Hero = () => {
                 </div>
 
                 {/* Bottom Stats */}
-                <motion.div
+                {/* <motion.div
                     className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                >
+                 >
                     {[
                         { number: "1M+", label: "Happy Patients" },
                         { number: "500+", label: "Expert Doctors" },
@@ -293,7 +295,7 @@ const Hero = () => {
                             <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
                         </motion.div>
                     ))}
-                </motion.div>
+                </motion.div> */}
             </div>
         </section>
     );

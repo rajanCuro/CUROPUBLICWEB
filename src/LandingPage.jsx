@@ -28,17 +28,17 @@ function LandingPage() {
                 </section>
 
                 {/* Upcoming Status */}
-                <section className="py-2 sm:py-10 ">
+                {/* <section className="py-2 sm:py-10 ">
                     <UpcommingStaus />
-                </section>
+                </section> */}
 
                 {/* Health Records */}
                 <section className="py-2 sm:py-10 ">
                     <HealthRecords />
                 </section>
-                <section className="py-2 sm:py-10 ">
+                {/* <section className="py-2 sm:py-10 ">
                     <Testimonial/>
-                </section>
+                </section> */}
             </div>
         </div>
     )
