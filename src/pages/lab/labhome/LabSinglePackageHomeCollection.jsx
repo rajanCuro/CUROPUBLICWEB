@@ -23,6 +23,71 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Function to categorize time slots
+  const categorizeSlots = (slots) => {
+    const categorized = {
+      morning: [],
+      afternoon: [],
+      evening: []
+    };
+
+    slots.forEach(slot => {
+      const startHour = parseInt(slot.startAt.split(':')[0]);
+      const endHour = parseInt(slot.endAt.split(':')[0]);
+      
+      // Determine category based on start time
+      if (startHour >= 6 && startHour < 12) {
+        categorized.morning.push(slot);
+      } else if (startHour >= 12 && startHour < 17) {
+        categorized.afternoon.push(slot);
+      } else if (startHour >= 17 && startHour < 22) {
+        categorized.evening.push(slot);
+      } else {
+        // For slots that don't fit neatly, add to appropriate category
+        if (startHour < 12) {
+          categorized.morning.push(slot);
+        } else if (startHour < 17) {
+          categorized.afternoon.push(slot);
+        } else {
+          categorized.evening.push(slot);
+        }
+      }
+    });
+
+    // Sort slots within each category
+    Object.keys(categorized).forEach(category => {
+      categorized[category].sort((a, b) => {
+        const aTime = a.startAt;
+        const bTime = b.startAt;
+        return aTime.localeCompare(bTime);
+      });
+    });
+
+    return categorized;
+  };
+
+  function convertTo12Hour(time24) {
+    let [hours, minutes] = time24.split(":");
+
+    let modifier = "AM";
+
+    hours = parseInt(hours, 10);
+
+    if (hours >= 12) {
+      modifier = "PM";
+      if (hours > 12) hours -= 12;
+    }
+
+    if (hours === 0) {
+      hours = 12;
+    }
+
+    // Format hours with leading zero
+    const formattedHours = hours.toString().padStart(2, "0");
+
+    return `${formattedHours}:${minutes} ${modifier}`;
+  }
+
   // --- Normalize labCartItems to ensure labPackage exists ---
   const normalizedLabCartItems = labCartItems?.map((pkg) => {
     if (!pkg) return null;
@@ -212,7 +277,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   const renderSelectedSummary = (pkgId) => {
     const s = selections[pkgId];
     if (!s) return null;
-    const slotName = s.slotStartAt && s.slotEndAt ? `${s.slotStartAt} - ${s.slotEndAt}` : "N/A";
+    const slotName = s.slotStartAt && s.slotEndAt ? `${convertTo12Hour(s.slotStartAt)} - ${convertTo12Hour(s.slotEndAt)}` : "N/A";
     const patientName = s.patientName || "N/A";
     const addressName = s.addressName || "N/A";
 
@@ -279,6 +344,133 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
             </React.Fragment>
           ))}
         </div>
+      </div>
+    );
+  };
+
+  // Function to render categorized time slots
+  const renderCategorizedSlots = () => {
+    const categorizedSlots = categorizeSlots(slots);
+    
+    return (
+      <div className="space-y-6">
+        {/* Morning Slots */}
+        {categorizedSlots.morning.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                <span className="text-orange-600 text-lg">🌅</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Morning</h3>
+                <p className="text-sm text-gray-600">6:00 AM - 12:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {categorizedSlots.morning.map((slot) => (
+                <button
+                  key={slot.id}
+                  onClick={() => onSelectSlot(slot)}
+                  className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${selections[activePackage]?.selectedSlotId === String(slot.id)
+                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                    }`}
+                >
+                  <span className="font-semibold text-base">
+                    {convertTo12Hour(slot.startAt)}
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    to {convertTo12Hour(slot.endAt)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Afternoon Slots */}
+        {categorizedSlots.afternoon.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                <span className="text-yellow-600 text-lg">☀️</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Afternoon</h3>
+                <p className="text-sm text-gray-600">12:00 PM - 5:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {categorizedSlots.afternoon.map((slot) => (
+                <button
+                  key={slot.id}
+                  onClick={() => onSelectSlot(slot)}
+                  className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${selections[activePackage]?.selectedSlotId === String(slot.id)
+                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                    }`}
+                >
+                  <span className="font-semibold text-base">
+                    {convertTo12Hour(slot.startAt)}
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    to {convertTo12Hour(slot.endAt)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Evening Slots */}
+        {categorizedSlots.evening.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span className="text-indigo-600 text-lg">🌙</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Evening</h3>
+                <p className="text-sm text-gray-600">5:00 PM - 10:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {categorizedSlots.evening.map((slot) => (
+                <button
+                  key={slot.id}
+                  onClick={() => onSelectSlot(slot)}
+                  className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${selections[activePackage]?.selectedSlotId === String(slot.id)
+                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                    }`}
+                >
+                  <span className="font-semibold text-base">
+                    {convertTo12Hour(slot.startAt)}
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    to {convertTo12Hour(slot.endAt)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* No Slots Available */}
+        {slots.length === 0 && (
+          <div className="text-center py-10 bg-white rounded-lg border border-gray-200">
+            <div className="text-4xl mb-4">📅</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No slots available</h3>
+            <p className="text-gray-600 mb-4">Try selecting a different date</p>
+            <input
+              type="date"
+              value={appointmentDate}
+              onChange={(e) => setAppointmentDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="block px-4 py-2 border border-gray-300 rounded-md mx-auto"
+            />
+          </div>
+        )}
       </div>
     );
   };
@@ -462,57 +654,75 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                               value={appointmentDate}
                               onChange={(e) => setAppointmentDate(e.target.value)}
                               min={new Date().toISOString().split('T')[0]}
-                              className="block px-4 py-2 border border-gray-300 rounded-md"
+                              className="block px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                             />
+                            <span className="text-sm text-gray-600">
+                              Select a date to view available time slots
+                            </span>
                           </div>
                         </div>
 
-                        {/* Slots */}
-                        {activeStep === "slots" && (
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {slots?.length ? (
-                              slots.map((slot) => (
-                                <button
-                                  key={slot.id}
-                                  onClick={() => onSelectSlot(slot)}
-                                  className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
-                                >
-                                  {slot.startAt} - {slot.endAt}
-                                </button>
-                              ))
-                            ) : (
-                              <p>No slots available for selected date</p>
-                            )}
-                          </div>
-                        )}
+                        {/* Time Slots - Categorized */}
+                        {activeStep === "slots" && renderCategorizedSlots()}
 
                         {/* Family Members */}
                         {activeStep === "family" && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {familyMembers.map((fm) => (
-                              <button
-                                key={fm.id}
-                                onClick={() => onSelectFamily(fm)}
-                                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
-                              >
-                                {fm.name}
-                              </button>
-                            ))}
+                          <div className="bg-white rounded-lg border border-gray-200 p-5">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                              {familyMembers.map((fm) => (
+                                <button
+                                  key={fm.id}
+                                  onClick={() => onSelectFamily(fm)}
+                                  className={`p-4 rounded-lg border transition-all duration-200 flex flex-col items-center ${selections[activePackage]?.patientId === String(fm.id)
+                                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                    }`}
+                                >
+                                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
+                                    👤
+                                  </div>
+                                  <span className="font-semibold text-base">{fm.name}</span>
+                                  <span className="text-sm text-gray-500 mt-1">Age: {fm.age || "N/A"}</span>
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         )}
 
                         {/* Addresses */}
                         {activeStep === "address" && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {addresses.map((ad) => (
-                              <button
-                                key={ad.id}
-                                onClick={() => onSelectAddress(ad)}
-                                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
-                              >
-                                {ad.city} - {ad.houseNumber || ad.fullAddress}
-                              </button>
-                            ))}
+                          <div className="bg-white rounded-lg border border-gray-200 p-5">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Address</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {addresses.map((ad) => (
+                                <button
+                                  key={ad.id}
+                                  onClick={() => onSelectAddress(ad)}
+                                  className={`p-4 rounded-lg border transition-all duration-200 text-left ${selections[activePackage]?.selectedAddressId === String(ad.id)
+                                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                    }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                      <span className="text-gray-600">📍</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-semibold text-base block mb-1">
+                                        {ad.city} - {ad.houseNumber || ad.fullAddress}
+                                      </span>
+                                      <span className="text-sm text-gray-600 block">
+                                        {ad.fullAddress}
+                                      </span>
+                                      <span className="text-xs text-gray-500 mt-2 block">
+                                        {ad.state} • {ad.pinCode}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -527,12 +737,19 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
               <button
                 disabled={!allPackagesCompleted || loading}
                 onClick={handleCheckout}
-                className={`px-8 py-3 rounded-lg font-semibold text-white ${allPackagesCompleted
-                  ? "bg-teal-600 hover:bg-teal-700"
+                className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${allPackagesCompleted
+                  ? "bg-teal-600 hover:bg-teal-700 hover:shadow-lg transform hover:-translate-y-0.5"
                   : "bg-gray-400 cursor-not-allowed"
                   }`}
               >
-                {loading ? "Processing..." : "Checkout"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Processing...
+                  </span>
+                ) : (
+                  "Proceed to Checkout"
+                )}
               </button>
             </div>
           </div>

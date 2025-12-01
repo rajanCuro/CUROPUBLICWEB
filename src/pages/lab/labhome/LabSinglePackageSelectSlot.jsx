@@ -22,6 +22,70 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Function to categorize time slots
+  const categorizeSlots = (slots) => {
+    const categorized = {
+      morning: [],
+      afternoon: [],
+      evening: []
+    };
+
+    slots.forEach(slot => {
+      const startHour = parseInt(slot.startAt.split(':')[0]);
+      
+      // Determine category based on start time
+      if (startHour >= 6 && startHour < 12) {
+        categorized.morning.push(slot);
+      } else if (startHour >= 12 && startHour < 17) {
+        categorized.afternoon.push(slot);
+      } else if (startHour >= 17 && startHour < 22) {
+        categorized.evening.push(slot);
+      } else {
+        // For slots that don't fit neatly, add to appropriate category
+        if (startHour < 12) {
+          categorized.morning.push(slot);
+        } else if (startHour < 17) {
+          categorized.afternoon.push(slot);
+        } else {
+          categorized.evening.push(slot);
+        }
+      }
+    });
+
+    // Sort slots within each category
+    Object.keys(categorized).forEach(category => {
+      categorized[category].sort((a, b) => {
+        const aTime = a.startAt;
+        const bTime = b.startAt;
+        return aTime.localeCompare(bTime);
+      });
+    });
+
+    return categorized;
+  };
+
+  function convertTo12Hour(time24) {
+    let [hours, minutes] = time24.split(":");
+
+    let modifier = "AM";
+
+    hours = parseInt(hours, 10);
+
+    if (hours >= 12) {
+      modifier = "PM";
+      if (hours > 12) hours -= 12;
+    }
+
+    if (hours === 0) {
+      hours = 12;
+    }
+
+    // Format hours with leading zero
+    const formattedHours = hours.toString().padStart(2, "0");
+
+    return `${formattedHours}:${minutes} ${modifier}`;
+  }
+
   // Normalize labCartItems to ensure labPackage exists
   const normalizedLabCartItems = labCartItems
     ?.map(pkg => {
@@ -188,7 +252,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   const renderSelectedSummary = (pkgId) => {
     const s = selections[pkgId];
     if (!s) return null;
-    const slotName = s.slotStartAt && s.slotEndAt ? `${s.slotStartAt} - ${s.slotEndAt}` : "N/A";
+    const slotName = s.slotStartAt && s.slotEndAt ? `${convertTo12Hour(s.slotStartAt)} - ${convertTo12Hour(s.slotEndAt)}` : "N/A";
     const patientName = s.patientName || "N/A";
 
     return (
@@ -248,6 +312,165 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
             </React.Fragment>
           ))}
         </div>
+      </div>
+    );
+  };
+
+  // Function to render categorized time slots
+  const renderCategorizedSlots = (pkgId) => {
+    const categorizedSlots = categorizeSlots(slots);
+    
+    return (
+      <div className="space-y-6">
+        {/* Morning Slots */}
+        {categorizedSlots.morning.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                <span className="text-orange-600 text-lg">🌅</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Morning</h3>
+                <p className="text-sm text-gray-600">6:00 AM - 12:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {categorizedSlots.morning.map((slot) => {
+                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                return (
+                  <button
+                    key={slot.id}
+                    onClick={() => onSelectSlot(slot)}
+                    className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                      ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-300"
+                      : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                      }`}
+                  >
+                    <span className="font-semibold text-base">
+                      {convertTo12Hour(slot.startAt)}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      to {convertTo12Hour(slot.endAt)}
+                    </span>
+                    {slot.capacity && (
+                      <span className="text-xs text-gray-400 mt-2">
+                        {slot.capacity} slots
+                      </span>
+                    )}
+                    {isSelected && (
+                      <div className="mt-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Afternoon Slots */}
+        {categorizedSlots.afternoon.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                <span className="text-yellow-600 text-lg">☀️</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Afternoon</h3>
+                <p className="text-sm text-gray-600">12:00 PM - 5:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {categorizedSlots.afternoon.map((slot) => {
+                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                return (
+                  <button
+                    key={slot.id}
+                    onClick={() => onSelectSlot(slot)}
+                    className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                      ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-300"
+                      : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                      }`}
+                  >
+                    <span className="font-semibold text-base">
+                      {convertTo12Hour(slot.startAt)}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      to {convertTo12Hour(slot.endAt)}
+                    </span>
+                    {slot.capacity && (
+                      <span className="text-xs text-gray-400 mt-2">
+                        {slot.capacity} slots
+                      </span>
+                    )}
+                    {isSelected && (
+                      <div className="mt-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Evening Slots */}
+        {categorizedSlots.evening.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span className="text-indigo-600 text-lg">🌙</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Evening</h3>
+                <p className="text-sm text-gray-600">5:00 PM - 10:00 PM</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {categorizedSlots.evening.map((slot) => {
+                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                return (
+                  <button
+                    key={slot.id}
+                    onClick={() => onSelectSlot(slot)}
+                    className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                      ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-300"
+                      : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                      }`}
+                  >
+                    <span className="font-semibold text-base">
+                      {convertTo12Hour(slot.startAt)}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      to {convertTo12Hour(slot.endAt)}
+                    </span>
+                    {slot.capacity && (
+                      <span className="text-xs text-gray-400 mt-2">
+                        {slot.capacity} slots
+                      </span>
+                    )}
+                    {isSelected && (
+                      <div className="mt-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* No Slots Available */}
+        {slots.length === 0 && (
+          <div className="text-center py-10 bg-white rounded-lg border border-gray-200">
+            <div className="text-4xl mb-4">📅</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No slots available</h3>
+            <p className="text-gray-600 mb-4">Try selecting a different date</p>
+          </div>
+        )}
       </div>
     );
   };
@@ -438,58 +661,14 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                           </div>
                         </div>
 
-                        {/* Slots Selection */}
-                        {activeStep === "slots" && (
-                          <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-base font-medium text-gray-900 mb-4">
-                              Available Time Slots
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                              {slots.length === 0 ? (
-                                <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                  <div className="text-lg mb-2">No slots available</div>
-                                  <p className="text-sm">Please try selecting a different date</p>
-                                </div>
-                              ) : (
-                                slots.map((slot) => {
-                                  const isChosen = selections[pkgId]?.selectedSlotId === String(slot.id);
-                                  return (
-                                    <button
-                                      key={slot.id}
-                                      onClick={() => onSelectSlot(slot)}
-                                      className={`p-4 rounded-lg border text-left transition-colors ${isChosen
-                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
-                                        }`}
-                                    >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="font-medium text-gray-900">
-                                          {slot.startAt} - {slot.endAt}
-                                        </div>
-                                        {isChosen && (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="text-xs text-gray-600">
-                                        {slot.capacity} slots available
-                                      </div>
-                                    </button>
-                                  );
-                                })
-                              )}
-                            </div>
-                          </div>
-                        )}
+                        {/* Slots Selection - Now categorized */}
+                        {activeStep === "slots" && renderCategorizedSlots(pkgId)}
 
                         {/* Family Members Selection */}
                         {activeStep === "family" && (
-                          <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-base font-medium text-gray-900 mb-4">
-                              Select Patient
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="bg-white rounded-lg border border-gray-200 p-5">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                               {familyMembers.length === 0 ? (
                                 <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                   <div className="text-lg mb-2">No family members found</div>
@@ -502,24 +681,21 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                                     <button
                                       key={fm.id}
                                       onClick={() => onSelectFamily(fm)}
-                                      className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
+                                      className={`p-4 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
+                                        ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-200"
+                                        : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
                                         }`}
                                     >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="font-medium text-gray-900">
-                                          {fm.name}
-                                        </div>
-                                        {chosen && (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        )}
+                                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
+                                        👤
                                       </div>
-                                      {fm.relationship && (
-                                        <div className="text-xs text-gray-600">
-                                          {fm.relationship}
+                                      <span className="font-semibold text-base">{fm.name}</span>
+                                      <span className="text-sm text-gray-500 mt-1">
+                                        {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
+                                      </span>
+                                      {chosen && (
+                                        <div className="mt-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                          <span className="text-white text-xs">✓</span>
                                         </div>
                                       )}
                                     </button>
@@ -551,14 +727,14 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                   <button
                     onClick={handleCheckout}
                     disabled={loading}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors min-w-[140px] ${loading
+                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${loading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-teal-600 hover:bg-teal-700"
+                      : "bg-teal-600 hover:bg-teal-700 hover:shadow-lg transform hover:-translate-y-0.5"
                       }`}
                   >
                     {loading ? (
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         Processing...
                       </div>
                     ) : (

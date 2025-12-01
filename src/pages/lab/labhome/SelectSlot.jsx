@@ -24,6 +24,70 @@ function SelectSlot({ labCartItems }) {
     const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    // Function to categorize time slots
+    const categorizeSlots = (slots) => {
+        const categorized = {
+            morning: [],
+            afternoon: [],
+            evening: []
+        };
+
+        slots.forEach(slot => {
+            const startHour = parseInt(slot.startAt.split(':')[0]);
+            
+            // Determine category based on start time
+            if (startHour >= 6 && startHour < 12) {
+                categorized.morning.push(slot);
+            } else if (startHour >= 12 && startHour < 17) {
+                categorized.afternoon.push(slot);
+            } else if (startHour >= 17 && startHour < 22) {
+                categorized.evening.push(slot);
+            } else {
+                // For slots that don't fit neatly, add to appropriate category
+                if (startHour < 12) {
+                    categorized.morning.push(slot);
+                } else if (startHour < 17) {
+                    categorized.afternoon.push(slot);
+                } else {
+                    categorized.evening.push(slot);
+                }
+            }
+        });
+
+        // Sort slots within each category
+        Object.keys(categorized).forEach(category => {
+            categorized[category].sort((a, b) => {
+                const aTime = a.startAt;
+                const bTime = b.startAt;
+                return aTime.localeCompare(bTime);
+            });
+        });
+
+        return categorized;
+    };
+
+    function convertTo12Hour(time24) {
+        let [hours, minutes] = time24.split(":");
+
+        let modifier = "AM";
+
+        hours = parseInt(hours, 10);
+
+        if (hours >= 12) {
+            modifier = "PM";
+            if (hours > 12) hours -= 12;
+        }
+
+        if (hours === 0) {
+            hours = 12;
+        }
+
+        // Format hours with leading zero
+        const formattedHours = hours.toString().padStart(2, "0");
+
+        return `${formattedHours}:${minutes} ${modifier}`;
+    }
+
     // --- API Calls ---
     const fetchSlots = async (labId) => {
         try {
@@ -100,8 +164,10 @@ function SelectSlot({ labCartItems }) {
         }));
     };
 
+    // FIXED: Proper toggleApplyToAll function
     const toggleApplyToAll = () => {
         if (!applyToAllEnabled) {
+            // Apply first package's selections to all packages
             const firstPkgId = Object.keys(selections)[0];
             if (!firstPkgId) return;
 
@@ -110,20 +176,33 @@ function SelectSlot({ labCartItems }) {
 
             labCartItems.forEach((pkg) => {
                 const pkgId = pkg.labPackage.id;
-                newSelections[pkgId] = { ...firstSelection, selectedPackageId: String(pkgId) };
+                // Create a copy of the first selection but with the correct package ID
+                newSelections[pkgId] = { 
+                    ...firstSelection, 
+                    selectedPackageId: String(pkgId),
+                    // Keep the patient name, slot times, etc. but update package-specific info
+                };
             });
 
             setSelections(newSelections);
             setApplyToAllEnabled(true);
         } else {
-            const firstPkgId = Object.keys(selections)[0];
-            const firstSelection = selections[firstPkgId];
-            setSelections({ [firstPkgId]: firstSelection });
+            // When turning OFF "Apply to all", keep all selections but reset the flag
+            // Don't clear any data - just turn off the apply-to-all mode
             setApplyToAllEnabled(false);
         }
     };
 
-    const onClickPackage = (pkg) => setActivePackage(pkg.labPackage.id);
+    const onClickPackage = (pkg) => {
+        // If apply to all is enabled, warn user that changes will affect all packages
+        if (applyToAllEnabled) {
+            if (window.confirm("'Apply to all packages' is enabled. Editing this package will update all packages. Do you want to continue?")) {
+                setActivePackage(pkg.labPackage.id);
+            }
+        } else {
+            setActivePackage(pkg.labPackage.id);
+        }
+    };
 
     const onSelectSlot = (slot) => {
         updateSelectionForActivePackage({
@@ -147,6 +226,26 @@ function SelectSlot({ labCartItems }) {
             selectedAddressId: String(ad.id),
             addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
         });
+        
+        // If apply to all is enabled, apply this selection to all packages
+        if (applyToAllEnabled) {
+            const currentSelection = selections[activePackage];
+            const newSelections = {};
+            
+            labCartItems.forEach((pkg) => {
+                const pkgId = pkg.labPackage.id;
+                newSelections[pkgId] = { 
+                    ...currentSelection, 
+                    selectedPackageId: String(pkgId),
+                    // Update the address for all packages
+                    selectedAddressId: String(ad.id),
+                    addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
+                };
+            });
+            
+            setSelections(newSelections);
+        }
+        
         setActivePackage(null);
         setActiveStep(null);
     };
@@ -183,11 +282,8 @@ function SelectSlot({ labCartItems }) {
             console.log("Order response:", response.data);
             await getAllLabCartItems()
             navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
-
-            // navigate('/lab/appointment/confirm');
         } catch (error) {
             console.error("Order error:", error.response?.data || error.message);
-            // You might want to add error notification here
         } finally {
             setLoading(false);
         }
@@ -208,7 +304,7 @@ function SelectSlot({ labCartItems }) {
     const renderSelectedSummary = (pkgId) => {
         const s = selections[pkgId];
         if (!s) return null;
-        const slotName = s.slotStartAt && s.slotEndAt ? `${s.slotStartAt} - ${s.slotEndAt}` : "N/A";
+        const slotName = s.slotStartAt && s.slotEndAt ? `${convertTo12Hour(s.slotStartAt)} - ${convertTo12Hour(s.slotEndAt)}` : "N/A";
         const patientName = s.patientName || "N/A";
         const addressName = s.addressName || "N/A";
 
@@ -217,6 +313,11 @@ function SelectSlot({ labCartItems }) {
                 <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
                     <span className="text-sm font-medium text-gray-700">All details selected</span>
+                    {applyToAllEnabled && (
+                        <span className="text-xs font-medium bg-teal-100 text-teal-800 px-2 py-1 rounded-full">
+                            Applied to all
+                        </span>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="flex flex-col">
@@ -279,6 +380,228 @@ function SelectSlot({ labCartItems }) {
         );
     };
 
+    // Function to render categorized time slots
+    const renderCategorizedSlots = (pkgId) => {
+        const categorizedSlots = categorizeSlots(slots);
+        
+        return (
+            <div className="space-y-6">
+                {/* Morning Slots */}
+                {categorizedSlots.morning.length > 0 && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-5">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                <span className="text-orange-600 text-lg">🌅</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Morning</h3>
+                                <p className="text-sm text-gray-600">6:00 AM - 12:00 PM</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {categorizedSlots.morning.map((slot) => {
+                                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                                return (
+                                    <button
+                                        key={slot.id}
+                                        onClick={() => {
+                                            onSelectSlot(slot);
+                                            // If apply to all is enabled, apply this slot to all packages
+                                            if (applyToAllEnabled) {
+                                                const currentSelection = selections[pkgId];
+                                                const newSelections = {};
+                                                
+                                                labCartItems.forEach((pkg) => {
+                                                    const otherPkgId = pkg.labPackage.id;
+                                                    newSelections[otherPkgId] = { 
+                                                        ...(selections[otherPkgId] || {}),
+                                                        selectedPackageId: String(otherPkgId),
+                                                        selectedSlotId: String(slot.id),
+                                                        slotStartAt: slot.startAt,
+                                                        slotEndAt: slot.endAt,
+                                                        appointmentDate
+                                                    };
+                                                });
+                                                
+                                                setSelections(newSelections);
+                                            }
+                                        }}
+                                        className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                                            ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                                            : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                            }`}
+                                    >
+                                        <span className="font-semibold text-base">
+                                            {convertTo12Hour(slot.startAt)}
+                                        </span>
+                                        <span className="text-xs text-gray-500 mt-1">
+                                            to {convertTo12Hour(slot.endAt)}
+                                        </span>
+                                        {slot.capacity && (
+                                            <span className="text-xs text-gray-400 mt-2">
+                                                {slot.capacity} slots
+                                            </span>
+                                        )}
+                                        {isSelected && (
+                                            <div className="mt-2 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                <span className="text-white text-xs">✓</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Afternoon Slots */}
+                {categorizedSlots.afternoon.length > 0 && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-5">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                                <span className="text-yellow-600 text-lg">☀️</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Afternoon</h3>
+                                <p className="text-sm text-gray-600">12:00 PM - 5:00 PM</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {categorizedSlots.afternoon.map((slot) => {
+                                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                                return (
+                                    <button
+                                        key={slot.id}
+                                        onClick={() => {
+                                            onSelectSlot(slot);
+                                            // If apply to all is enabled, apply this slot to all packages
+                                            if (applyToAllEnabled) {
+                                                const currentSelection = selections[pkgId];
+                                                const newSelections = {};
+                                                
+                                                labCartItems.forEach((pkg) => {
+                                                    const otherPkgId = pkg.labPackage.id;
+                                                    newSelections[otherPkgId] = { 
+                                                        ...(selections[otherPkgId] || {}),
+                                                        selectedPackageId: String(otherPkgId),
+                                                        selectedSlotId: String(slot.id),
+                                                        slotStartAt: slot.startAt,
+                                                        slotEndAt: slot.endAt,
+                                                        appointmentDate
+                                                    };
+                                                });
+                                                
+                                                setSelections(newSelections);
+                                            }
+                                        }}
+                                        className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                                            ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                                            : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                            }`}
+                                    >
+                                        <span className="font-semibold text-base">
+                                            {convertTo12Hour(slot.startAt)}
+                                        </span>
+                                        <span className="text-xs text-gray-500 mt-1">
+                                            to {convertTo12Hour(slot.endAt)}
+                                        </span>
+                                        {slot.capacity && (
+                                            <span className="text-xs text-gray-400 mt-2">
+                                                {slot.capacity} slots
+                                            </span>
+                                        )}
+                                        {isSelected && (
+                                            <div className="mt-2 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                <span className="text-white text-xs">✓</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Evening Slots */}
+                {categorizedSlots.evening.length > 0 && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-5">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <span className="text-indigo-600 text-lg">🌙</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Evening</h3>
+                                <p className="text-sm text-gray-600">5:00 PM - 10:00 PM</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {categorizedSlots.evening.map((slot) => {
+                                const isSelected = selections[pkgId]?.selectedSlotId === String(slot.id);
+                                return (
+                                    <button
+                                        key={slot.id}
+                                        onClick={() => {
+                                            onSelectSlot(slot);
+                                            // If apply to all is enabled, apply this slot to all packages
+                                            if (applyToAllEnabled) {
+                                                const currentSelection = selections[pkgId];
+                                                const newSelections = {};
+                                                
+                                                labCartItems.forEach((pkg) => {
+                                                    const otherPkgId = pkg.labPackage.id;
+                                                    newSelections[otherPkgId] = { 
+                                                        ...(selections[otherPkgId] || {}),
+                                                        selectedPackageId: String(otherPkgId),
+                                                        selectedSlotId: String(slot.id),
+                                                        slotStartAt: slot.startAt,
+                                                        slotEndAt: slot.endAt,
+                                                        appointmentDate
+                                                    };
+                                                });
+                                                
+                                                setSelections(newSelections);
+                                            }
+                                        }}
+                                        className={`px-4 py-3 rounded-lg border transition-all duration-200 flex flex-col items-center justify-center ${isSelected
+                                            ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-300"
+                                            : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                            }`}
+                                    >
+                                        <span className="font-semibold text-base">
+                                            {convertTo12Hour(slot.startAt)}
+                                        </span>
+                                        <span className="text-xs text-gray-500 mt-1">
+                                            to {convertTo12Hour(slot.endAt)}
+                                        </span>
+                                        {slot.capacity && (
+                                            <span className="text-xs text-gray-400 mt-2">
+                                                {slot.capacity} slots
+                                            </span>
+                                        )}
+                                        {isSelected && (
+                                            <div className="mt-2 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                <span className="text-white text-xs">✓</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* No Slots Available */}
+                {slots.length === 0 && (
+                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200">
+                        <div className="text-4xl mb-4">📅</div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No slots available</h3>
+                        <p className="text-gray-600 mb-4">Try selecting a different date</p>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     const completedPackagesCount = Object.keys(selections).filter(pkgId =>
         isPackageCompleted(pkgId)
     ).length;
@@ -329,13 +652,18 @@ function SelectSlot({ labCartItems }) {
                                 </div>
                             </div>
 
-                            {/* Apply to All Toggle */}
+                            {/* Apply to All Toggle - FIXED */}
                             {Object.keys(selections).length > 0 && (
                                 <div className="border-t border-gray-200 pt-4">
                                     <label className="flex items-center justify-between cursor-pointer">
-                                        <span className="text-sm font-medium text-gray-700">
-                                            Apply to all packages
-                                        </span>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium text-gray-700">
+                                                Apply to all packages
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                                {applyToAllEnabled ? "All packages will use same details" : "Turn on to sync all packages"}
+                                            </span>
+                                        </div>
                                         <div
                                             onClick={toggleApplyToAll}
                                             className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${applyToAllEnabled ? 'bg-teal-600' : 'bg-gray-300'
@@ -347,9 +675,13 @@ function SelectSlot({ labCartItems }) {
                                             />
                                         </div>
                                     </label>
-                                    <p className="text-xs text-gray-500 mt-2">
-                                        Apply first package's selections to all packages
-                                    </p>
+                                    {applyToAllEnabled && (
+                                        <div className="mt-3 p-2 bg-teal-50 border border-teal-200 rounded-lg">
+                                            <p className="text-xs text-teal-800">
+                                                <span className="font-medium">Note:</span> Any changes you make will be applied to all packages automatically.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -395,6 +727,11 @@ function SelectSlot({ labCartItems }) {
                                                                         Scheduled
                                                                     </span>
                                                                 )}
+                                                                {applyToAllEnabled && completed && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                                        Synced
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                             <div className="flex flex-wrap gap-4 text-sm">
                                                                 <div className="flex items-center gap-2">
@@ -434,6 +771,18 @@ function SelectSlot({ labCartItems }) {
                                                 {/* Step Indicator */}
                                                 {renderStepIndicator()}
 
+                                                {/* Apply All Banner */}
+                                                {applyToAllEnabled && (
+                                                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-blue-600">🔄</span>
+                                                            <p className="text-sm text-blue-800">
+                                                                <span className="font-medium">Apply to All Enabled:</span> Your selections will automatically apply to all {labCartItems.length} packages.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
                                                 {/* Date Selection */}
                                                 <div className="mb-6 bg-white p-4 rounded-lg border border-gray-200">
                                                     <label className="block text-base font-medium text-gray-900 mb-3">
@@ -443,7 +792,23 @@ function SelectSlot({ labCartItems }) {
                                                         <input
                                                             type="date"
                                                             value={appointmentDate}
-                                                            onChange={(e) => setAppointmentDate(e.target.value)}
+                                                            onChange={(e) => {
+                                                                const newDate = e.target.value;
+                                                                setAppointmentDate(newDate);
+                                                                // If apply to all is enabled, update date for all packages
+                                                                if (applyToAllEnabled) {
+                                                                    const newSelections = {};
+                                                                    labCartItems.forEach((pkg) => {
+                                                                        const otherPkgId = pkg.labPackage.id;
+                                                                        newSelections[otherPkgId] = { 
+                                                                            ...(selections[otherPkgId] || {}),
+                                                                            selectedPackageId: String(otherPkgId),
+                                                                            appointmentDate: newDate
+                                                                        };
+                                                                    });
+                                                                    setSelections(newSelections);
+                                                                }
+                                                            }}
                                                             min={new Date().toISOString().split('T')[0]}
                                                             className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-base font-medium"
                                                         />
@@ -453,58 +818,14 @@ function SelectSlot({ labCartItems }) {
                                                     </div>
                                                 </div>
 
-                                                {/* Slots Selection */}
-                                                {activeStep === "slots" && (
-                                                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                                        <h4 className="text-base font-medium text-gray-900 mb-4">
-                                                            Available Time Slots
-                                                        </h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                                                            {slots.length === 0 ? (
-                                                                <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                                                    <div className="text-lg mb-2">No slots available</div>
-                                                                    <p className="text-sm">Please try selecting a different date</p>
-                                                                </div>
-                                                            ) : (
-                                                                slots.map((slot) => {
-                                                                    const isChosen = selections[pkgId]?.selectedSlotId === String(slot.id);
-                                                                    return (
-                                                                        <button
-                                                                            key={slot.id}
-                                                                            onClick={() => onSelectSlot(slot)}
-                                                                            className={`p-4 rounded-lg border text-left transition-colors ${isChosen
-                                                                                ? "border-teal-500 bg-teal-50 ring-1 ring-teal-200"
-                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
-                                                                                }`}
-                                                                        >
-                                                                            <div className="flex items-center justify-between mb-2">
-                                                                                <div className="font-medium text-gray-900">
-                                                                                    {slot.startAt} - {slot.endAt}
-                                                                                </div>
-                                                                                {isChosen && (
-                                                                                    <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
-                                                                                        <span className="text-white text-xs">✓</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="text-xs text-gray-600">
-                                                                                {slot.capacity} slots available
-                                                                            </div>
-                                                                        </button>
-                                                                    );
-                                                                })
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                {/* Slots Selection - Now categorized */}
+                                                {activeStep === "slots" && renderCategorizedSlots(pkgId)}
 
                                                 {/* Family Members Selection */}
                                                 {activeStep === "family" && (
-                                                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                                        <h4 className="text-base font-medium text-gray-900 mb-4">
-                                                            Select Patient
-                                                        </h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                    <div className="bg-white rounded-lg border border-gray-200 p-5">
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                                             {familyMembers.length === 0 ? (
                                                                 <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                                                     <div className="text-lg mb-2">No family members found</div>
@@ -516,25 +837,38 @@ function SelectSlot({ labCartItems }) {
                                                                     return (
                                                                         <button
                                                                             key={fm.id}
-                                                                            onClick={() => onSelectFamily(fm)}
-                                                                            className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                                                                ? "border-teal-500 bg-teal-50 ring-1 ring-teal-200"
-                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
+                                                                            onClick={() => {
+                                                                                onSelectFamily(fm);
+                                                                                // If apply to all is enabled, apply this patient to all packages
+                                                                                if (applyToAllEnabled) {
+                                                                                    const newSelections = {};
+                                                                                    labCartItems.forEach((pkg) => {
+                                                                                        const otherPkgId = pkg.labPackage.id;
+                                                                                        newSelections[otherPkgId] = { 
+                                                                                            ...(selections[otherPkgId] || {}),
+                                                                                            selectedPackageId: String(otherPkgId),
+                                                                                            patientId: String(fm.id),
+                                                                                            patientName: fm.name
+                                                                                        };
+                                                                                    });
+                                                                                    setSelections(newSelections);
+                                                                                }
+                                                                            }}
+                                                                            className={`p-4 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
+                                                                                ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
+                                                                                : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
                                                                                 }`}
                                                                         >
-                                                                            <div className="flex items-center justify-between mb-2">
-                                                                                <div className="font-medium text-gray-900">
-                                                                                    {fm.name}
-                                                                                </div>
-                                                                                {chosen && (
-                                                                                    <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
-                                                                                        <span className="text-white text-xs">✓</span>
-                                                                                    </div>
-                                                                                )}
+                                                                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
+                                                                                👤
                                                                             </div>
-                                                                            {fm.relationship && (
-                                                                                <div className="text-xs text-gray-600">
-                                                                                    {fm.relationship}
+                                                                            <span className="font-semibold text-base">{fm.name}</span>
+                                                                            <span className="text-sm text-gray-500 mt-1">
+                                                                                {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
+                                                                            </span>
+                                                                            {chosen && (
+                                                                                <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                                                    <span className="text-white text-xs">✓</span>
                                                                                 </div>
                                                                             )}
                                                                         </button>
@@ -547,13 +881,11 @@ function SelectSlot({ labCartItems }) {
 
                                                 {/* Address Selection */}
                                                 {activeStep === "address" && (
-                                                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                                        <h4 className="text-base font-medium text-gray-900 mb-4">
-                                                            Select Address
-                                                        </h4>
-                                                        <div className="grid grid-cols-1 gap-3">
+                                                    <div className="bg-white rounded-lg border border-gray-200 p-5">
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Address</h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             {addresses.length === 0 ? (
-                                                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                                                <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                                                     <div className="text-lg mb-2">No addresses found</div>
                                                                     <p className="text-sm">Add addresses in your profile</p>
                                                                 </div>
@@ -564,24 +896,32 @@ function SelectSlot({ labCartItems }) {
                                                                         <button
                                                                             key={ad.id}
                                                                             onClick={() => onSelectAddress(ad)}
-                                                                            className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                                                                ? "border-teal-500 bg-teal-50 ring-1 ring-teal-200"
-                                                                                : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
+                                                                            className={`p-4 rounded-lg border transition-all duration-200 text-left ${chosen
+                                                                                ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
+                                                                                : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
                                                                                 }`}
                                                                         >
-                                                                            <div className="flex items-center justify-between mb-2">
-                                                                                <div className="font-medium text-gray-900">
-                                                                                    {ad.city}
+                                                                            <div className="flex items-start gap-3">
+                                                                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                                                    <span className="text-gray-600">📍</span>
                                                                                 </div>
-                                                                                {chosen && (
-                                                                                    <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
-                                                                                        <span className="text-white text-xs">✓</span>
-                                                                                    </div>
-                                                                                )}
+                                                                                <div>
+                                                                                    <span className="font-semibold text-base block mb-1">
+                                                                                        {ad.city} - {ad.houseNumber || ad.fullAddress}
+                                                                                    </span>
+                                                                                    <span className="text-sm text-gray-600 block">
+                                                                                        {ad.fullAddress}
+                                                                                    </span>
+                                                                                    <span className="text-xs text-gray-500 mt-2 block">
+                                                                                        {ad.state} • {ad.pinCode}
+                                                                                    </span>
+                                                                                </div>
                                                                             </div>
-                                                                            <div className="text-sm text-gray-600">
-                                                                                {ad.houseNumber || ad.fullAddress}
-                                                                            </div>
+                                                                            {chosen && (
+                                                                                <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center ml-auto">
+                                                                                    <span className="text-white text-xs">✓</span>
+                                                                                </div>
+                                                                            )}
                                                                         </button>
                                                                     );
                                                                 })
@@ -607,18 +947,25 @@ function SelectSlot({ labCartItems }) {
                                         <div className="text-sm text-gray-600">
                                             All {labCartItems.length} packages are scheduled and confirmed
                                         </div>
+                                        {applyToAllEnabled && (
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                                    📦 All packages use same details
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         onClick={handleCheckout}
                                         disabled={loading}
-                                        className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors min-w-[140px] ${loading
+                                        className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${loading
                                             ? "bg-gray-400 cursor-not-allowed"
-                                            : "bg-teal-600 hover:bg-teal-700"
+                                            : "bg-teal-600 hover:bg-teal-700 hover:shadow-lg transform hover:-translate-y-0.5"
                                             }`}
                                     >
                                         {loading ? (
                                             <div className="flex items-center justify-center gap-2">
-                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                                 Processing...
                                             </div>
                                         ) : (
