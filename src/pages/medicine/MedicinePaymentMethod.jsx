@@ -58,16 +58,16 @@ function PaymentMethod() {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
-                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from.prescription || ""}`
+                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from.prescription || ""}&paymentMethod=COD`
             );
             localStorage.removeItem("recentAcceptedPrescriptionId")
             localStorage.removeItem("recentUplaodedPrescriptionIs")
-
+            console.log("order",response)
             navigate('/medicine/checkout/order-confirm', { state: { payment: selectedPayment, totalAmount, cartData } })
             setLoading(false)
             await getAllMedicineCartItems(userId);
         } catch (error) {
-            console.log(error);
+            console.log(error.response);
             setLoading(false);
         }
     };
@@ -220,7 +220,7 @@ function PaymentMethod() {
                         disabled={!(selectedPayment && selectedAddressId)}
                         className={`w-full text-white font-bold py-3 rounded-lg 
                             ${selectedPayment && selectedAddressId
-                                ? "bg-green-600 hover:bg-green-700 cursor-pointer"
+                                ? "bg-teal-700 hover:bg-green-800 cursor-pointer"
                                 : "bg-gray-300 cursor-not-allowed"
                             }`}
                     >

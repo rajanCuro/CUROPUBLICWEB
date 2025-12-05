@@ -6,6 +6,7 @@ import axiosInstance from "../../Authorization/axiosInstance";
 import { toast } from 'react-toastify';
 import { useAuth } from "../../Authorization/AuthContext";
 import SimilarMedicineProduct from "./SimilarMedicineProduct";
+import LoadingAnimation from "../../LoaderSpinner";
 
 const ShopByHealthConcernMedicne = () => {
     const { name } = useParams();
@@ -129,9 +130,8 @@ const ShopByHealthConcernMedicne = () => {
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="flex justify-center items-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-                    </div>
+                    <LoadingAnimation />
+
                 )}
 
                 {/* Medicines Grid */}

@@ -15,7 +15,7 @@ function LabHome() {
       <TestByCategory />
       <LabPopularPackages />
       <TestByVitalOrganList/>
-      <Testimonial/>
+      {/* <Testimonial/> */}
 
     </div>
   )

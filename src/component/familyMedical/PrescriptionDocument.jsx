@@ -4,6 +4,7 @@ import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
 import { MdDownload, MdEdit, MdFilterList, MdSort, MdCalendarToday } from "react-icons/md";
 import { SlCalender } from "react-icons/sl";
+import LoadingAnimation from "../../LoaderSpinner";
 
 function PrescriptionDocument({ data }) {
     const { userData } = useAuth();
@@ -82,7 +83,7 @@ function PrescriptionDocument({ data }) {
     };
 
     const getStatusColor = (acceptedAt) => {
-        return acceptedAt ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800";
+        return acceptedAt ? "bg-teal-100 text-teal-800" : "bg-yellow-100 text-yellow-800";
     };
 
     const getStatusText = (acceptedAt) => {
@@ -127,8 +128,8 @@ function PrescriptionDocument({ data }) {
                     </div>
 
                     {/* User card */}
-                    <div className="flex items-center gap-3 p-2 bg-green-50 rounded-lg w-full sm:w-auto">
-                        <div className="bg-green-500 w-10 h-10 md:w-12 md:h-12 rounded-full 
+                    <div className="flex items-center gap-3 p-2 bg-teal-50 rounded-lg w-full sm:w-auto">
+                        <div className="bg-teal-500 w-10 h-10 md:w-12 md:h-12 rounded-full 
                                 flex items-center justify-center text-white 
                                 text-base md:text-lg font-semibold">
                             {data?.name?.charAt(0)}
@@ -159,7 +160,7 @@ function PrescriptionDocument({ data }) {
                                     key={type}
                                     onClick={() => setPrescriptionType(type)}
                                     className={`px-4 py-1.5 rounded-md text-sm cursor-pointer font-medium ${prescriptionType === type
-                                        ? "bg-blue-500 text-white"
+                                        ? "bg-teal-500 text-white"
                                         : "text-gray-600 hover:text-gray-800"
                                         }`}
                                 >
@@ -202,9 +203,7 @@ function PrescriptionDocument({ data }) {
 
             {/* Loader */}
             {loading && (
-                <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-                </div>
+                <LoadingAnimation/>
             )}
 
             {/* Empty */}
@@ -267,7 +266,7 @@ function PrescriptionDocument({ data }) {
                                         <span
                                             className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-semibold 
                                                             ${item.acceptedAt
-                                                    ? "bg-green-100 text-green-700"
+                                                    ? "bg-teal-100 text-teal-700"
                                                     : "bg-yellow-100 text-yellow-700"
                                                 }`}
                                         >
@@ -284,7 +283,7 @@ function PrescriptionDocument({ data }) {
                                         {/* Submit */}
                                         <button
                                             onClick={() => handleEditSubmit(item)}
-                                            className="px-3 py-2 bg-green-500 hover:bg-green-600 
+                                            className="px-3 py-2 bg-teal-500 hover:bg-teal-600 
                                                             text-white rounded-md text-sm"
                                         >
                                             Submit
@@ -308,7 +307,7 @@ function PrescriptionDocument({ data }) {
                                                 setEditTag(item.prescriptionTag || "");
                                             }}
                                             className="flex items-center justify-center gap-1 
-                                                                bg-blue-500 hover:bg-blue-600 text-white rounded-md  
+                                                                bg-teal-500 hover:bg-teal-600 text-white rounded-md  
                                                                 p-2 md:px-3 md:py-2 text-sm"
                                         >
                                             <MdEdit className="text-xs md:text-lg" />
@@ -319,7 +318,7 @@ function PrescriptionDocument({ data }) {
                                         <button
                                             onClick={() => downloadFile(item.prescriptionUrl)}
                                             className="flex items-center justify-center gap-1 
-                                                                bg-green-500 hover:bg-green-600 text-white rounded-md  
+                                                                bg-teal-500 hover:bg-teal-600 text-white rounded-md  
                                                                 p-2 md:px-3 md:py-2 text-sm"
                                         >
                                             <MdDownload className="text-xs md:text-lg" />

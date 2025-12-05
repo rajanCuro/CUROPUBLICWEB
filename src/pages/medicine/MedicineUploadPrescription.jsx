@@ -7,7 +7,7 @@ import axiosInstance from "../../Authorization/axiosInstance";
 import { useStomp } from "../../notification/StompSocket";
 import { useNavigate } from "react-router-dom";
 
-const MedicineUploadPrescription = ({ onClose, mode ,from }) => {
+const MedicineUploadPrescription = ({ onClose, mode, from }) => {
     const { userData, latitude, longitude, token, setAuthModal } = useAuth();
     const userId = userData?.id;
 
@@ -25,7 +25,7 @@ const MedicineUploadPrescription = ({ onClose, mode ,from }) => {
     const [subscription, setSubscription] = useState(null);
     const [recentAcceptedPrescriptionId, setRecentAcceptedPrescriptionId] = useState(localStorage.getItem("recentAcceptedPrescriptionId"));
 
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     // -------------------------
     // Fetch Family Members
     // -------------------------
@@ -123,7 +123,7 @@ const MedicineUploadPrescription = ({ onClose, mode ,from }) => {
         const lat = latitude || 0;
         const lan = longitude || 0;
         const prescriptionFor = "Pharmacy";
-        const processFurther = actionType === "Continue";
+        const processFurther = actionType === "Continue" && mode !== "saved";
 
         let body = {
             uploadedBy: { id: userId },
@@ -200,7 +200,7 @@ const MedicineUploadPrescription = ({ onClose, mode ,from }) => {
         const sub = subscribe(endpoint, async (msg) => {
             console.log(`💬 Message from ${endpoint}:`, msg);
             // console.log(body)
-            localStorage.setItem("recentAcceptedPrescriptionId",msg.prescriptionId)
+            localStorage.setItem("recentAcceptedPrescriptionId", msg.prescriptionId)
             setRecentAcceptedPrescriptionId(msg.prescriptionId)
             Alert.alert(
                 '🔔 New Notification',

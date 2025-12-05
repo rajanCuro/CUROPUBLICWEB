@@ -105,7 +105,7 @@ const FamilyMemeberList = () => {
                 <div className="">
                     <button
                         onClick={() => setShowOtherHistory(false)}
-                        className="text-blue-600 underline mb-4"
+                        className="text-teal-600 underline mb-4"
                     >
                         ← Back
                     </button>
@@ -147,14 +147,14 @@ const FamilyMemeberList = () => {
                                     {/* Mobile: + Family */}
                                     <button
                                         onClick={() => setAddNewFamilyModal(true)}
-                                        className="bg-green-500 text-white px-1 text-xs py-1 rounded-md md:hidden">
+                                        className="bg-teal-500 text-white px-1 text-xs py-1 rounded-md md:hidden">
                                         + Family
                                     </button>
 
                                     {/* Desktop: Add New Family */}
                                     <button
                                         onClick={() => setAddNewFamilyModal(true)}
-                                        className="bg-green-500 text-white px-3 py-1 rounded-md hidden md:block">
+                                        className="bg-teal-500 text-white px-3 py-1 rounded-md hidden md:block">
                                         Add New Family
                                     </button>
                                 </div>
@@ -164,12 +164,12 @@ const FamilyMemeberList = () => {
                                         key={item.id}
                                         onClick={() => setSelectedMember(item)}
                                         className={`flex items-center justify-between px-3 py-4 mb-3 rounded-xl shadow-md cursor-pointer
-                                        ${selectedMember?.id === item.id ? "bg-green-50" : "bg-white"}`}
+                                        ${selectedMember?.id === item.id ? "bg-teal-50" : "bg-white"}`}
                                     >
                                         {/* Left Side */}
                                         <div className="flex items-center gap-4">
-                                            <div className="h-8 w-8 md:h-12 md:w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <FaUser className="text-blue-700 text-sm md:text-lg" />
+                                            <div className="h-8 w-8 md:h-12 md:w-12 bg-teal-100 rounded-full flex items-center justify-center">
+                                                <FaUser className="text-teal-700 text-sm md:text-lg" />
                                             </div>
 
                                             <div>
@@ -252,7 +252,7 @@ const FamilyMemeberList = () => {
                     <div className="bg-white w-full max-w-2xl max-h-[75vh] rounded-md shadow-lg relative overflow-y-auto">
 
                         {/* Header */}
-                        <div className="flex justify-between items-center py-3 px-4 bg-blue-200 rounded-t-md">
+                        <div className="flex justify-between items-center py-3 px-4 bg-teal-200 rounded-t-md">
                             <p className="font-semibold text-gray-800"></p>
 
                             <button

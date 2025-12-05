@@ -1,13 +1,59 @@
 // src/component/Hero.jsx
-import React, { useState } from "react";
-import { FiSearch, FiUpload, FiArrowRight, FiPlay, FiShield, FiClock, FiStar } from "react-icons/fi";
-import { HiOutlineFolderOpen } from "react-icons/hi";
+import React, { useEffect, useState } from "react";
+import { FiSearch, FiArrowRight, FiShield, FiClock, FiStar } from "react-icons/fi";
 import { motion } from "framer-motion";
-import heroImg from '../assets/doctor/doc.png';
 import { TypeAnimation } from "react-type-animation";
+
+// Import all your images
+import doctorImg from '../assets/doctor/doc.png';
+import ambulanceImg from '../assets/doctor/ambulance.png';
+import pharmacyImg from '../assets/doctor/ph.png';
+import bloodBankImg from '../assets/doctor/blood1.png';
 
 const Hero = () => {
     const [searchValue, setSearchValue] = useState("");
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Items with their corresponding images
+    const items = [
+        {
+            big: "Curo24",
+            small: "Doctors",
+            image: doctorImg,
+        },
+        {
+            big: "Curo24",
+            small: "Ambulance",
+            image: ambulanceImg,
+        },
+        {
+            big: "Curo24",
+            small: "Pharmacy",
+            image: pharmacyImg,
+        },
+        {
+            big: "Curo24",
+            small: "Blood Bank",
+            image: bloodBankImg,
+        }
+    ];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isTransitioning) {
+                setIsTransitioning(true);
+                setCurrentIndex(prev => (prev + 1) % items.length);
+                // Reset transitioning state after animation completes
+                setTimeout(() => {
+                    setIsTransitioning(false);
+                }, 3000); // Match this with your animation duration
+            }
+        }, 6000); // Increased interval to 6 seconds for slower transitions
+
+        return () => clearInterval(interval);
+    }, [isTransitioning, items.length]);
 
     // Animation variants
     const containerVariants = {
@@ -27,18 +73,6 @@ const Hero = () => {
             y: 0,
             opacity: 1,
             transition: {
-                duration: 0.5,
-                ease: "easeOut"
-            }
-        }
-    };
-
-    const imageVariants = {
-        hidden: { x: 100, opacity: 0 },
-        visible: {
-            x: 0,
-            opacity: 1,
-            transition: {
                 duration: 0.8,
                 ease: "easeOut"
             }
@@ -48,18 +82,55 @@ const Hero = () => {
     const floatingAnimation = {
         y: [-10, 10, -10],
         transition: {
-            duration: 4,
+            duration: 6,
             repeat: Infinity,
             ease: "easeInOut"
         }
     };
 
-    return (
-        <section className="w-full relative overflow-hidden">
-            {/* Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50"></div>
+    // Slow motion image transition variants
+    const imageTransitionVariants = {
+        initial: { 
+            opacity: 0, 
+            scale: 0.9,
+            rotateY: -5,
+            filter: "blur(4px)"
+        },
+        animate: { 
+            opacity: 1, 
+            scale: 1,
+            rotateY: 0,
+            filter: "blur(0px)",
+            transition: {
+                duration: 3, // Increased to 3 seconds for slow motion
+                ease: [0.25, 0.46, 0.45, 0.94], // Custom ease for smoothness
+                opacity: { duration: 2 },
+                scale: { duration: 2.5 }
+            }
+        },
+        exit: { 
+            opacity: 0, 
+            scale: 1.05,
+            rotateY: 5,
+            filter: "blur(4px)",
+            transition: {
+                duration: 2,
+                ease: "easeInOut"
+            }
+        }
+    };
 
-            {/* Animated Background Elements */}
+    // Fixed styling constants
+    const bgColor = "from-teal-50 via-blue-50 to-purple-50";
+    const gradientColors = "from-teal-600 to-blue-600";
+    const textGradient = "from-teal-600 via-blue-600 to-purple-600";
+
+    return (
+        <section className="w-full relative overflow-hidden min-h-screen">
+            {/* Static Background Gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${bgColor}`}></div>
+
+            {/* Animated Background Elements - Slowed down */}
             <div className="absolute inset-0 overflow-hidden">
                 <motion.div
                     className="absolute top-10 left-10 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-20"
@@ -68,7 +139,7 @@ const Hero = () => {
                         y: [0, -50, 0],
                     }}
                     transition={{
-                        duration: 10,
+                        duration: 20,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
@@ -80,7 +151,7 @@ const Hero = () => {
                         y: [0, 60, 0],
                     }}
                     transition={{
-                        duration: 12,
+                        duration: 25,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
@@ -92,7 +163,7 @@ const Hero = () => {
                         y: [0, -80, 0],
                     }}
                     transition={{
-                        duration: 14,
+                        duration: 30,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
@@ -107,22 +178,21 @@ const Hero = () => {
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                    >
-                        <motion.div variants={itemVariants}>
-                            {/* Badge */}
+                     >
+                        {/* <motion.div variants={itemVariants}>
                             <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-teal-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                                 <FiStar className="text-teal-600 w-4 h-4" />
                                 <span className="text-[10px] font-medium text-teal-800">
                                     Trusted by 1M+ Patients Across India
                                 </span>
                             </div>
-                        </motion.div>
+                        </motion.div> */}
 
                         <motion.h1
                             variants={itemVariants}
                             className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight"
                         >
-                            <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <span className={`bg-gradient-to-r ${textGradient} bg-clip-text text-transparent`}>
                                 Curo24
                             </span>
                         </motion.h1>
@@ -131,18 +201,18 @@ const Hero = () => {
                             variants={itemVariants}
                             className="text-xl md:text-3xl lg:text-4xl font-semibold mt-2 md:mt-4"
                         >
-                            <span className="bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">
+                            <span className={`bg-gradient-to-r ${gradientColors} bg-clip-text text-transparent`}>
                                 <TypeAnimation
                                     sequence={[
                                         "Your Complete Digital Healthcare Partner",
-                                        2000,
+                                        3000,
                                         "Trusted Care, Anytime and Anywhere",
-                                        2000,
+                                        3000,
                                         "24/7 Healthcare at Your Fingertips",
-                                        2000,
+                                        3000,
                                     ]}
                                     wrapper="span"
-                                    speed={50}
+                                    speed={40}
                                     repeat={Infinity}
                                     cursor={true}
                                 />
@@ -151,9 +221,9 @@ const Hero = () => {
 
                         <motion.p
                             variants={itemVariants}
-                            className="text-gray-600 mt-4 md:mt-6 text-lg md:text-xl max-w-2xl leading-relaxed"
+                            className="text-gray-600 mt-4 md:mt-6 text-lg md:text-xl max-w-2xl leading-relaxed capitalizes caption-bottom"
                         >
-                            Order medicines, book doctor appointments, schedule lab tests, and access all your health information in one secure place. Your health journey starts here.
+                            Your health, simplified — medicines, doctors, lab tests ambulance and blood bank in one app.
                         </motion.p>
 
                         {/* Search Bar */}
@@ -173,16 +243,13 @@ const Hero = () => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="ml-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold flex items-center gap-2 hover:shadow-lg transition-all duration-300"
+                                    className={`ml-2 bg-gradient-to-r ${gradientColors} text-white px-6 py-2 rounded-xl font-semibold flex items-center gap-2 hover:shadow-lg transition-all duration-300`}
                                 >
                                     Search
                                     <FiArrowRight className="w-4 h-4" />
                                 </motion.button>
                             </div>
                         </motion.div>
-
-                        {/* Quick Actions */}
-
 
                         {/* Features */}
                         <motion.div
@@ -206,34 +273,60 @@ const Hero = () => {
                         </motion.div>
                     </motion.div>
 
-                    {/* Right Image */}
-                    <motion.div
-                        className="flex-1 flex justify-center"
-                        variants={imageVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
+                    {/* Right Image with Slow Motion */}
+                    <div className="flex-1 flex justify-center">
                         <div className="relative">
                             {/* Main Image Container */}
                             <motion.div
                                 className="relative"
                                 animate={floatingAnimation}
                             >
-                                <img
-                                    src={heroImg}
-                                    alt="Doctor illustration"
-                                    className="w-80 md:w-96 lg:w-[500px] object-contain drop-shadow-2xl"
-                                />
+                                {/* Fixed size image container with perspective */}
+                                <div className="w-[350px] h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] flex items-center justify-center perspective-1000">
+                                    <motion.div
+                                        key={currentIndex}
+                                        initial="initial"
+                                        animate="animate"
+                                        variants={imageTransitionVariants}
+                                        className="relative w-full h-full preserve-3d"
+                                        style={{
+                                            transformStyle: 'preserve-3d'
+                                        }}
+                                    >
+                                        <img
+                                            src={items[currentIndex].image}
+                                            alt={`${items[currentIndex].small} illustration`}
+                                            className="w-full h-full object-contain drop-shadow-2xl"
+                                            style={{ 
+                                                maxWidth: '100%', 
+                                                maxHeight: '100%',
+                                                width: 'auto',
+                                                height: 'auto'
+                                            }}
+                                        />
+                                        
+                                        {/* Glow effect during transition */}
+                                        {isTransitioning && (
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-full"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 0.3 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 1.5 }}
+                                            />
+                                        )}
+                                    </motion.div>
+                                </div>
 
-                                {/* Floating Elements */}
+                                {/* Floating Elements - Slowed down */}
                                 <motion.div
-                                    className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100"
+                                    className="absolute top-0 -right-4 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100"
                                     animate={{
                                         y: [-5, 5, -5],
-                                        rotate: [0, 5, 0],
+                                        rotate: [0, 3, 0],
                                     }}
                                     transition={{
-                                        duration: 3,
+                                        duration: 8,
                                         repeat: Infinity,
                                         ease: "easeInOut"
                                     }}
@@ -245,57 +338,35 @@ const Hero = () => {
                                 </motion.div>
 
                                 <motion.div
-                                    className="absolute -bottom-4 -left-4 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-2xl p-4 shadow-2xl"
+                                    className={`absolute bottom-4 -left-4 bg-gradient-to-r ${gradientColors} text-white rounded-2xl p-4 shadow-2xl w-32`}
                                     animate={{
                                         y: [5, -5, 5],
                                         scale: [1, 1.05, 1],
                                     }}
                                     transition={{
-                                        duration: 4,
+                                        duration: 10,
                                         repeat: Infinity,
                                         ease: "easeInOut"
                                     }}
-                                 >
+                                >
                                     <div className="text-center">
-                                        {/* <div className="text-sm font-bold">500+</div>
-                                        <div className="text-xs">Doctors Online</div> */}
-                                        <div className="text-sm font-bold">Curo24</div>
-                                        {/* <div className="text-xs">24</div> */}
+                                        <div className="text-sm font-bold">{items[currentIndex].big}</div>
+                                        <div className="text-xs">{items[currentIndex].small}</div>
                                     </div>
                                 </motion.div>
                             </motion.div>
 
-                            {/* Background Decoration */}
+                            {/* Static Background Decoration */}
                             <div className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-blue-500/20 rounded-full blur-3xl -z-10 scale-150"></div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
 
-                {/* Bottom Stats */}
-                {/* <motion.div
-                    className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8, duration: 0.6 }}
-                 >
-                    {[
-                        { number: "1M+", label: "Happy Patients" },
-                        { number: "500+", label: "Expert Doctors" },
-                        { number: "100+", label: "Cities Across India" },
-                        { number: "24/7", label: "Support Available" }
-                    ].map((stat, index) => (
-                        <motion.div
-                            key={index}
-                            whileHover={{ scale: 1.05 }}
-                            className="text-center bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/80 shadow-sm hover:shadow-md transition-all duration-300"
-                        >
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
-                                {stat.number}
-                            </div>
-                            <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
-                        </motion.div>
-                    ))}
-                </motion.div> */}
+                {/* Manual Navigation Dots with slow animation */}
+                
+
+                {/* Current Service Indicator */}
+                
             </div>
         </section>
     );

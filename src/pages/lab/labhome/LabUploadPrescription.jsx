@@ -7,7 +7,7 @@ import { useAuth } from "../../../Authorization/AuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 
 const LabUploadPrescription = ({ onClose, mode }) => {
-    const { userData, latitude, longitude } = useAuth();
+    const { userData, latitude, longitude ,setAuthModal } = useAuth();
     const userId = userData?.id;
 
     const [file, setFile] = useState(null);
@@ -82,6 +82,10 @@ const LabUploadPrescription = ({ onClose, mode }) => {
     // Main Upload Method
     // -------------------------
     const uploadFile = async (actionType) => {
+        if (!userId) {
+            setAuthModal(true)
+            return;
+        }
         if (!file) {
             alert("Please select an image first");
             return;

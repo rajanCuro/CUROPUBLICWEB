@@ -12,13 +12,14 @@ import {
     Calendar,
     FileText
 } from "lucide-react";
+import { useAuth } from "../../../Authorization/AuthContext";
 
 function LabPackageDetails() {
     const location = useLocation();
     const navigate = useNavigate();
-
+    const { userData, setAuthModal } = useAuth()
     const rawData = location.state;
-
+    const id = userData?.id
     // Normalize data
     const item = rawData?.labPackage ? rawData : rawData?.pkg;
     const labPackage = item?.labPackage || item?.pkg?.labPackage;
@@ -45,6 +46,14 @@ function LabPackageDetails() {
         if (name.length <= 2) return name[0] + "*****@" + domain;
         return name[0] + "*".repeat(name.length - 2) + name[name.length - 1] + "@" + domain;
     };
+
+    const handleBookthisPackage = (item) => {
+        if (!id) {
+            setAuthModal(true)
+            return;
+        }
+        navigate('/lab/package/single/package', { state: { item } })
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -242,7 +251,7 @@ function LabPackageDetails() {
 
                             <div className="space-y-2 lg:space-y-3">
                                 <button
-                                    onClick={() => navigate('/lab/package/single/package', { state: { item } })}
+                                    onClick={() => handleBookthisPackage(item)}
                                     className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 text-sm lg:text-base"
                                 >
                                     Book This Package

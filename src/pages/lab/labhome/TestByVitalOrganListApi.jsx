@@ -3,13 +3,14 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../Authorization/axiosInstance';
 import { useLabAuth } from '../../../Authorization/LabAuthContext';
-import { FaShoppingCart, FaHeart, FaMapMarkerAlt, FaClock, FaTag, FaSearch, FaFilter, FaTimes } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaMapMarkerAlt,FaSearch } from 'react-icons/fa';
 import { MdLocalHospital } from 'react-icons/md';
 import { useAuth } from '../../../Authorization/AuthContext';
+import LoadingAnimation from '../../../LoaderSpinner';
 
 function TestByVitalOrganListApi() {
-    const { latitude, longitude,  getAllLabCartItems, labCartItems } = useLabAuth()
-    const {userData} = useAuth()
+    const { latitude, longitude, getAllLabCartItems, labCartItems } = useLabAuth()
+    const { userData } = useAuth()
     const navigate = useNavigate()
     const [packageId, setPackageId] = useState(null)
     const id = userData?.id
@@ -21,18 +22,15 @@ function TestByVitalOrganListApi() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [totalItems, setTotalItems] = useState(0);
-    const [showFilters, setShowFilters] = useState(false);
     const location = useLocation();
     const organName = location.state?.organName;
     const [search, setSearch] = useState(location.state?.organName || '')
     const [searchTimeout, setSearchTimeout] = useState(null)
 
     // Filter states
-    const [filters, setFilters] = useState({
-        minPrice: '',
-        maxPrice: '',
+    const [filters, setFilters] = useState({       
         sortBy: 'distance', // distance, price_low, price_high, name
-        labType: ''
+     
     });
 
     useEffect(() => {
@@ -51,18 +49,18 @@ function TestByVitalOrganListApi() {
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearch(value);
-        
+
         // Clear existing timeout
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
-        
+
         // Set new timeout
         const newTimeout = setTimeout(() => {
             setPageNumber(1);
             setOrganData([]);
         }, 500);
-        
+
         setSearchTimeout(newTimeout);
     }
 
@@ -82,13 +80,7 @@ function TestByVitalOrganListApi() {
                 lat: latitude,
                 lng: longitude,
                 distance: distance
-            });
-
-            // Add filters
-            if (filters.minPrice) params.append('minPrice', filters.minPrice);
-            if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-            if (filters.sortBy) params.append('sortBy', filters.sortBy);
-            if (filters.labType) params.append('labType', filters.labType);
+            });        
 
             const response = await axiosInstance.get(
                 `/endUserEndPoint/searchTestByTestName?${params.toString()}`
@@ -101,12 +93,12 @@ function TestByVitalOrganListApi() {
                 } else {
                     setOrganData(prev => [...prev, ...(response.data.dtoList || [])]);
                 }
-                
+
                 // Check if there are more items to load
                 setTotalItems(response.data.totalItems || 0);
                 setHasMore(
-                    response.data.dtoList && 
-                    response.data.dtoList.length === size && 
+                    response.data.dtoList &&
+                    response.data.dtoList.length === size &&
                     (response.data.totalItems || 0) > organData.length + response.data.dtoList.length
                 );
             }
@@ -120,12 +112,12 @@ function TestByVitalOrganListApi() {
 
     const addToCart = async (item) => {
         try {
-            
+
             setPackageId(item.labPackage.id);
             const response = await axiosInstance.post(
                 `endUserEndPoint/addTestPackageToCart?userId=${id}&packageId=${item.labPackage.id}`
             );
-            console.log("Add to cart",response);
+            console.log("Add to cart", response);
             await getAllLabCartItems();
             setPackageId(null);
         } catch (error) {
@@ -182,12 +174,7 @@ function TestByVitalOrganListApi() {
         }
     };
 
-    const handleFilterChange = (key, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [key]: value
-        }));
-    };
+
 
     const clearFilters = () => {
         setFilters({
@@ -206,16 +193,11 @@ function TestByVitalOrganListApi() {
     };
 
     // Distance options
-    const distanceOptions = [5, 10, 15, 20, 25, 50];
+    const distanceOptions = [2, 5, 10, 15, 20, 25, 50];
 
     if (loading && organData.length === 0) {
         return (
-            <div className="flex justify-center items-center min-h-96">
-                <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mb-4"></div>
-                    <div className="text-lg text-gray-600">Loading available tests...</div>
-                </div>
-            </div>
+            <LoadingAnimation />
         );
     }
 
@@ -225,125 +207,44 @@ function TestByVitalOrganListApi() {
                 {/* Search and Filter Section */}
                 <div className="mb-6 sm:mb-8 space-y-4">
                     {/* Search Bar */}
-                    <div className="relative max-w-2xl mx-auto">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FaSearch className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input 
-                            type="text" 
-                            value={search} 
-                            onChange={handleSearchChange}
-                            placeholder="Search for tests, packages, or organs..."
-                            className="block w-full pl-10 pr-12 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm sm:text-base transition-all duration-200"
-                        />
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-teal-600 transition-colors"
-                        >
-                            <FaFilter className="h-5 w-5" />
-                        </button>
-                    </div>
+
 
                     {/* Filters Panel */}
-                    {showFilters && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
-                                <div className="flex items-center space-x-3">
-                                    <button
-                                        onClick={clearFilters}
-                                        className="text-sm text-gray-600 hover:text-teal-600 transition-colors flex items-center"
-                                    >
-                                        <FaTimes className="h-4 w-4 mr-1" />
-                                        Clear All
-                                    </button>
-                                    <button
-                                        onClick={() => setShowFilters(false)}
-                                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                                    >
-                                        <FaTimes className="h-5 w-5" />
-                                    </button>
-                                </div>
+
+                    <div className="bg-white flex gap-2 rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                        <div className="relative w-full md:w-[75%] mx-auto ">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FaSearch className="h-5 w-5 text-gray-400" />
                             </div>
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={handleSearchChange}
+                                placeholder="Search for tests, packages, or organs..."
+                                className="block w-full pl-10 pr-12 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm sm:text-base transition-all duration-200"
+                            />
+                            
+                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                                {/* Distance Filter */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Distance (km)
-                                    </label>
-                                    <select
-                                        value={distance}
-                                        onChange={(e) => handleDistanceChange(Number(e.target.value))}
-                                        className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                    >
-                                        {distanceOptions.map(option => (
-                                            <option key={option} value={option}>
-                                                Within {option} km
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Price Range */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Price Range
-                                    </label>
-                                    <div className="flex space-x-2">
-                                        <input
-                                            type="number"
-                                            placeholder="Min"
-                                            value={filters.minPrice}
-                                            onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                                            className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Max"
-                                            value={filters.maxPrice}
-                                            onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                                            className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Sort By */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Sort By
-                                    </label>
-                                    <select
-                                        value={filters.sortBy}
-                                        onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                    >
-                                        <option value="distance">Distance (Nearest)</option>
-                                        <option value="price_low">Price (Low to High)</option>
-                                        <option value="price_high">Price (High to Low)</option>
-                                        <option value="name">Name (A-Z)</option>
-                                    </select>
-                                </div>
-
-                                {/* Lab Type */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Lab Type
-                                    </label>
-                                    <select
-                                        value={filters.labType}
-                                        onChange={(e) => handleFilterChange('labType', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
-                                    >
-                                        <option value="">All Labs</option>
-                                        <option value="hospital">Hospital Labs</option>
-                                        <option value="independent">Independent Labs</option>
-                                        <option value="chain">Chain Labs</option>
-                                    </select>
-                                </div>
+                        <div className="w-full md:w-[25%]">
+                            {/* Distance Filter */}
+                            <div>
+                               
+                                <select
+                                    value={distance}
+                                    onChange={(e) => handleDistanceChange(Number(e.target.value))}
+                                    className="w-full border border-gray-300 rounded-xl px-3 py-4.5 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
+                                >
+                                    {distanceOptions.map(option => (
+                                        <option key={option} value={option}>
+                                            Within {option} km
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
-                    )}
+                    </div>
+
                 </div>
 
                 {/* Header Section */}
@@ -552,7 +453,7 @@ function TestByVitalOrganListApi() {
                                                 <div className="flex space-x-2">
                                                     {isInCart(item.labPackage.id) ? (
                                                         <button
-                                                            onClick={() => navigate("/lab_cartitems")}
+                                                            onClick={() => navigate("/lab/cartitems")}
                                                             className="flex cursor-pointer items-center space-x-1 sm:space-x-2 border border-teal-700 text-teal-700 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-200 hover:shadow-lg text-xs sm:text-sm"
                                                         >
                                                             <FaShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -584,7 +485,7 @@ function TestByVitalOrganListApi() {
                         {/* Load More Button */}
                         {hasMore && (
                             <div className="flex justify-center mt-8 sm:mt-12">
-                                <button 
+                                <button
                                     onClick={loadMore}
                                     disabled={loadingMore}
                                     className="bg-white text-teal-600 border border-teal-600 hover:bg-teal-50 px-6 sm:px-8 py-2 sm:py-3 rounded-xl font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-w-32"

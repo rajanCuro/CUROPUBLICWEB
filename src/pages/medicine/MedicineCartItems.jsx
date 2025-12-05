@@ -6,6 +6,7 @@ import axiosInstance from "../../Authorization/axiosInstance";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import SimilaMedicineProduct from '../medicine/SimilarMedicineProduct'
+import LoadingAnimation from "../../LoaderSpinner";
 
 
 
@@ -131,10 +132,7 @@ function MedicineCartItems() {
 
     if (loading)
         return (
-            <div className="flex flex-col items-center justify-center py-20">
-                <div className="animate-spin h-10 w-10 border-4 border-teal-500 border-t-transparent rounded-full"></div>
-                <p className="mt-3 text-gray-600">Loading cart...</p>
-            </div>
+            <LoadingAnimation/>
         );
 
     if (cartData.length === 0) {

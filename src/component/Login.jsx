@@ -241,9 +241,9 @@ const Login = ({ onClose, onLoginSuccess }) => {
                   {/* Mobile Number */}
                   <div className="space-y-4 animate-slide-up">
                     <div className="relative">
-                      <FiSmartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
+                      {/* <FiSmartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" /> */}
                       <div className="flex border border-gray-300 rounded-xl overflow-hidden bg-white focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-transparent transition-all duration-300">
-                        <span className="px-4 py-3 bg-gray-100 font-semibold text-gray-700 flex items-center border-r">
+                        <span className="px-4 py-3 bg-gray-100 font-semibold text-gray-700  items-center border-0 ">
                           +91
                         </span>
                         <input

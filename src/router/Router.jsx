@@ -25,6 +25,7 @@ import PrescriptionWaiting from '../component/PrescriptionWaiting'
 import PrivacyCenter from '../component/PrivacyPolicy'
 import TermsAndConditions from '../component/TermsService'
 import ReturnRefundPolicy from '../component/ReturnRefundPolicy'
+import ContactUs from '../component/ContactUs'
 
 function Router() {
   return (
@@ -54,6 +55,7 @@ function Router() {
           <Route path='/privacy_policy' element={<PrivacyCenter />} />
           <Route path='/terms_of_service' element={<TermsAndConditions />} />
           <Route path='/return_refund_policies' element={<ReturnRefundPolicy />} />
+          <Route path='/conactUs' element={<ContactUs />} />
 
         </Routes>
         <LabRouting />

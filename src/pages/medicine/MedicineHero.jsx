@@ -15,7 +15,11 @@ import { useLabAuth } from "../../Authorization/LabAuthContext";
 
 const MedicineHero = () => {
     const navigate = useNavigate();
-    const sliderImages = [`https://images.pexels.com/photos/2280551/pexels-photo-2280551.jpeg`, `https://images.pexels.com/photos/1164531/pexels-photo-1164531.jpeg`, `https://images.pexels.com/photos/4167541/pexels-photo-4167541.jpeg`];
+    const sliderImages = [
+        `https://images.pexels.com/photos/2280551/pexels-photo-2280551.jpeg`,
+        `https://images.pexels.com/photos/1164531/pexels-photo-1164531.jpeg`,
+        `https://images.pexels.com/photos/4167541/pexels-photo-4167541.jpeg`
+    ];
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false);
     const [uploadMode, setUploadMode] = useState("normal");
     const [searchText, setSearchText] = useState("");
@@ -24,6 +28,35 @@ const MedicineHero = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { screen, setScreen } = useLabAuth()
+    const [placeholderIndex, setPlaceholderIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // AUTO ROTATE PLACEHOLDER USING SEARCH HISTORY
+    useEffect(() => {
+        if (searchText.length > 0) return; // Stop rotation while typing
+
+        if (searchHistory.length === 0) return; // No history → no rotation
+
+        const interval = setInterval(() => {
+            setPlaceholderIndex((prev) =>
+                prev === searchHistory.length - 1 ? 0 : prev + 1
+            );
+        }, 2000); // every 2 seconds
+
+        return () => clearInterval(interval);
+    }, [searchText, searchHistory]);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -112,12 +145,12 @@ const MedicineHero = () => {
     };
 
     return (
-        <section className="w-full  container mx-auto">
-            <div className="w-full mx-auto flex flex-col md:flex-row items-center mt-20 justify-between ">
-                {/* LEFT AREA - equal width */}
-                <div className="w-full md:w-1/2 text-center md:text-left  p-2 hidden md:block space-y-6 ">
-                    <h1 className="text-xl md:text-5xl font-bold leading-tight ">
-                        <span className="bg-gradient-to-r from-teal-800 to-teal-300 text-transparent bg-clip-text">
+        <section className="w-full px-3 sm:px-4 md:px-6 lg:container mx-auto">
+            <div className="w-full mx-auto flex flex-col-reverse md:flex-row items-center mt-4 md:mt-20 justify-between">
+                {/* LEFT AREA - Mobile: full width, Desktop: 1/2 */}
+                <div className="w-full md:w-1/2 text-center md:text-left p-2 md:p-4 space-y-4 md:space-y-6">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight md:leading-tight">
+                        <span className="bg-gradient-to-r from-teal-800 to-teal-300 text-transparent bg-clip-text block min-h-[60px] md:min-h-auto">
                             <TypeAnimation
                                 sequence={[
                                     "Your Health, Our Priority",
@@ -134,29 +167,33 @@ const MedicineHero = () => {
                         </span>
                     </h1>
 
-
-                    <h2 className="text-md md:text-xl font-semibold text-gray-800 mt-2">
+                    <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800">
                         Fast & Reliable Pharmacy Services
                     </h2>
 
-                    <p className="text-gray-600 mt-3 text-sm max-w-md">
+                    <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto md:mx-0">
                         Order medicines, health products, and consultation from trusted pharmacies.
                     </p>
 
-                    {/* SEARCH BAR */}
-                    <div className="relative mt-6 max-w-md mx-auto md:mx-0">
-                        <div className="relative flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm">
+                    {/* SEARCH BAR - Mobile optimized */}
+                    <div className="relative mt-4 md:mt-6 max-w-full md:max-w-[525px] mx-auto md:mx-0">
+                        <div className="relative flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2.5 sm:py-2 shadow-sm">
                             <FiSearch
                                 className="text-gray-400 mr-2 cursor-pointer"
                                 onClick={() => handleSearch(searchText)}
+                                size={isMobile ? 18 : 16}
                             />
 
                             <input
                                 type="text"
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
-                                placeholder="Search medicines, health products..."
-                                className="w-full outline-none text-sm border-0 pr-8"
+                                placeholder={
+                                    searchHistory.length > 0 && searchText.length === 0
+                                        ? `Search for ${searchHistory[placeholderIndex]}`
+                                        : "Search medicines, health products..."
+                                }
+                                className="w-full outline-none text-sm sm:text-base border-0 pr-8 capitalize placeholder:text-sm sm:placeholder:text-base"
                             />
 
                             {searchText.length > 0 && (
@@ -171,7 +208,7 @@ const MedicineHero = () => {
                         </div>
 
                         {filteredSuggestions.length > 0 && (
-                            <div className="absolute w-full bg-white shadow-lg border rounded-lg mt-1 z-20">
+                            <div className="absolute w-full bg-white shadow-lg border rounded-lg mt-1 z-20 max-h-60 overflow-y-auto">
                                 {filteredSuggestions.map((item, index) => (
                                     <div
                                         key={index}
@@ -179,7 +216,7 @@ const MedicineHero = () => {
                                             setSearchText(item);
                                             handleSearch(item);
                                         }}
-                                        className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                                        className="px-3 py-2.5 text-sm cursor-pointer hover:bg-gray-100 border-b last:border-b-0"
                                     >
                                         {item}
                                     </div>
@@ -188,16 +225,16 @@ const MedicineHero = () => {
                         )}
                     </div>
 
-                    {/* BUTTONS */}
-                    <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                    {/* BUTTONS - Mobile stack vertically */}
+                    <div className="mt-4 md:mt-5 flex md:flex-row flex-col gap-3 justify-center md:justify-start">
                         <button
                             onClick={() => {
                                 setUploadMode("normal");
                                 setUploadPrescriptionModal(true);
                             }}
-                            className="bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold py-2.5 px-5 rounded-lg flex items-center justify-center gap-2"
+                            className="bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold py-3 md:py-2.5 px-5 rounded-lg flex items-center justify-center gap-2 w-full md:w-auto"
                         >
-                            <FiUpload size={16} />
+                            <FiUpload size={isMobile ? 18 : 16} />
                             Upload Prescription
                         </button>
 
@@ -206,16 +243,16 @@ const MedicineHero = () => {
                                 setUploadMode("saved");
                                 setUploadPrescriptionModal(true);
                             }}
-                            className="border border-gray-300 text-gray-800 hover:bg-gray-100 text-sm font-medium py-2.5 px-5 rounded-lg flex items-center justify-center gap-2"
+                            className="border border-gray-300 text-gray-800 hover:bg-gray-100 text-sm font-medium py-3 md:py-2.5 px-5 rounded-lg flex items-center justify-center gap-2 w-full md:w-auto"
                         >
-                            <HiOutlineFolderOpen size={18} />
+                            <HiOutlineFolderOpen size={isMobile ? 20 : 18} />
                             Upload from Saved Medical Records
                         </button>
                     </div>
                 </div>
 
-                {/* RIGHT SLIDER - equal width */}
-                <div className="w-full max-w-2xl relative rounded-2xl overflow-hidden h-64 sm:h-80 md:h-96 lg:h-[400px] mx-auto ">
+                {/* RIGHT SLIDER - Mobile: full width, Desktop: 1/2 */}
+                <div className="w-full md:w-1/2 max-w-2xl relative rounded-xl md:rounded-2xl overflow-hidden h-48 sm:h-60 md:h-80 lg:h-[400px] mx-auto mb-4 md:mb-0">
                     <div className="relative w-full h-full overflow-hidden">
                         {sliderImages.map((image, index) => (
                             <div
@@ -234,37 +271,39 @@ const MedicineHero = () => {
                         ))}
                     </div>
 
-                    {/* DOTS */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    {/* DOTS - Smaller on mobile */}
+                    <div className="absolute bottom-3 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1.5 sm:space-x-2">
                         {sliderImages.map((_, index) => (
-                            <div
+                            <button
                                 key={index}
-                                onClick={() => setCurrentIndex(index)}
-                                className={`w-3 h-3 rounded-full cursor-pointer transition-all ${index === currentIndex
+                                onClick={() => goToSlide(index)}
+                                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all ${index === currentIndex
                                     ? "bg-white scale-125"
                                     : "bg-white/50"
                                     }`}
+                                aria-label={`Go to slide ${index + 1}`}
                             />
                         ))}
                     </div>
                 </div>
             </div>
 
-            <MedicinePopularCategories />
-            <ShopByHealthConcern />
-          
-          
+            <div className="px-2 sm:px-0">
+                <MedicinePopularCategories />
+                <ShopByHealthConcern />
+            </div>
 
-            {/* UPLOAD PRESCRIPTION MODAL */}
+            {/* UPLOAD PRESCRIPTION MODAL - Mobile responsive */}
             {uploadPrescriptionModal && (
-                <div className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50">
-                    <div className="relative bg-white max-w-7xl w-full rounded-lg shadow-lg overflow-auto">
+                <div className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50 p-3 sm:p-4">
+                    <div className="relative bg-white w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-7xl rounded-lg shadow-lg overflow-auto max-h-[90vh] sm:max-h-[95vh]">
 
-                        {/* CLOSE BUTTON */}
+                        {/* CLOSE BUTTON - Larger touch target on mobile */}
                         <button
                             onClick={() => setUploadPrescriptionModal(false)}
                             className="absolute top-3 right-3 z-50 cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 
-                            rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold"
+                            rounded-full w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-lg font-bold"
+                            aria-label="Close modal"
                         >
                             ×
                         </button>
@@ -277,7 +316,6 @@ const MedicineHero = () => {
                     </div>
                 </div>
             )}
-
         </section>
     );
 };

@@ -8,7 +8,7 @@ import { FaXTwitter } from "react-icons/fa6";  // Twitter X icon
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-teal-50 via-white to-teal-50  py-10 px-6 md:px-12 lg:px-20">
+    <footer className="bg-gradient-to-r from-teal-50 via-white to-teal-50  py-10 px-6 md:px-12 lg:px-20 dark:bg-gray-500">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 items-center">
 
         {/* Left Section - Info */}
@@ -33,7 +33,7 @@ function Footer() {
           <div>
             <h3 className="text-gray-800 font-semibold mb-3 text-sm uppercase">Support</h3>
             <ul className="space-y-2 text-gray-600 text-sm">
-              <li><a href="#" className="hover:text-teal-700 transition">Contact Us</a></li>
+              <li><Link to="/conactUs" className="hover:text-teal-700 transition">Contact Us</Link></li>
               <li><a href="#" className="hover:text-teal-700 transition">FAQs</a></li>
               <li><a href="#" className="hover:text-teal-700 transition">Help Center</a></li>
             </ul>

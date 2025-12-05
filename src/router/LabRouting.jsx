@@ -16,8 +16,8 @@ function LabRouting() {
     <div>
       <Routes>
         <Route path='/lab' element={<LabHome />} />
-        <Route path='/lab_cartitems' element={<LabCartItems />} />
-        <Route path='/labPackage_details' element={<LabPackageDetails />} />
+        <Route path='/lab/cartitems' element={<LabCartItems />} />
+        <Route path='/lab/labPackage_details' element={<LabPackageDetails />} />
         <Route path='/lab/package/Alltests' element={<TestByCategoryTestList />} />
         <Route path='/lab/package/selectSlot' element={<SelectSlot />} />
         <Route path='/lab/package/typeCollection' element={<LabCollectionType />} />

@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaUserMd, FaGraduationCap, FaHospitalAlt, FaBriefcaseMedical } from "react-icons/fa";
 import { MdInfo, MdWork } from "react-icons/md";
 import { FaClinicMedical, FaMapMarkerAlt, FaClock, FaStar, FaUserCircle } from "react-icons/fa";
+import DoctorSubscription from './DoctorSubscription';
 
 export default function ViewDoctorDetails() {
     useEffect(() => {
@@ -85,6 +86,11 @@ export default function ViewDoctorDetails() {
                     </div>
                 </div>
             </div>
+            {/* subscription plane */}
+            <div className='bg-white rounded-2xl p-4 mt-4'>
+                <p className='text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-teal-700'>Membership Plan</p>
+                <DoctorSubscription />
+            </div>
 
             {/* About */}
             <div className="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6">
@@ -148,11 +154,7 @@ export default function ViewDoctorDetails() {
                 </div>
             </div>
 
-            {/* Availability */}
-            <div className="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6">
-                <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3">Availability</h2>
-                <p className="text-gray-700 text-sm sm:text-base">{doctor?.availability}</p>
-            </div>
+         
 
             {/* Clinic Details */}
             <div className="bg-white shadow-lg rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6">

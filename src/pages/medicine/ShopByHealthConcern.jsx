@@ -26,6 +26,8 @@ import {
     TbHeartRateMonitor,
 } from "react-icons/tb";
 import axiosInstance from "../../Authorization/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllhealthConcern } from "../../redux/features/medicineShopByhealthConcern";
 
 // Dummy icon set but with React Icons
 const dummyIcons = [
@@ -48,6 +50,13 @@ function ShopByHealthConcern() {
     const navigate = useNavigate();
     const [apiCategories, setApiCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch()
+    const { healthConcernList } = useSelector((state) => state.healthConcern);
+    // console.log("list", healthConcernList)
+
+    useEffect(() => {
+        dispatch(fetchAllhealthConcern())
+    }, [])
 
     const getAllShopByHealth = async () => {
         try {
@@ -115,15 +124,16 @@ function ShopByHealthConcern() {
                 initial="hidden"
                 animate="visible"
                 className="grid grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 justify-items-center px-8"
-             >
+            >
                 {combinedData.map((item, index) => (
                     <motion.div
                         key={index}
                         variants={itemVariants}
-                        onClick={() =>
-                            navigate(`/medicine/shopbyhealthconcern/medicine/${item.name}`)
-                        }
-                        className="relative cursor-pointer  w-full bg-white hover:scale-105 hover:bg-teal-600/20  rounded-xl  p-3 md:p-4 flex flex-col items-center justify-center shadow-sm transition-all duration-300 border border-gray-100"
+                        onClick={() => {
+                            const firstPart = item.name.split('/')[0].trim();
+                            navigate(`/medicine/shopbyhealthconcern/medicine/${encodeURIComponent(firstPart)}`);
+                        }}
+                        className="relative cursor-pointer w-full bg-white hover:scale-105 hover:bg-teal-600/20 rounded-xl p-3 md:p-4 flex flex-col items-center justify-center shadow-sm transition-all duration-300 border border-gray-100"
                         style={{ aspectRatio: "1/1", maxWidth: "160px" }}
                     >
                         <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl flex items-center justify-center mb-2 bg-gray-50 shadow-md">
@@ -135,6 +145,7 @@ function ShopByHealthConcern() {
                         </p>
                     </motion.div>
                 ))}
+
             </motion.div>
 
             {combinedData.length === 0 && !loading && (

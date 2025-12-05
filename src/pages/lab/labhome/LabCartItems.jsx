@@ -15,9 +15,11 @@ import {
     Calendar,
     TestTube
 } from 'lucide-react';
+import { useAuth } from '../../../Authorization/AuthContext';
 
 function LabCartItems() {
-    const { userData, getAllLabCartItems, labCartItems } = useLabAuth()
+    const { userData, getAllLabCartItems, labCartItems, } = useLabAuth()
+    const { setAuthModal } = useAuth()
     const navigate = useNavigate()
     const id = userData?.id;
 
@@ -28,6 +30,10 @@ function LabCartItems() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
+        if (!id) {
+            setAuthModal(true)
+            return
+        }
         // Fetch cart items
         getAllLabCartItems();
 
@@ -162,7 +168,7 @@ function LabCartItems() {
                                                     <div className="flex-shrink-0">
                                                         <div className="relative">
                                                             <img
-                                                                src={item.labPackage?.packageImage || "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"}
+                                                                src={item.labPackage?.tests[0].imagesUrl[0] || "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"}
                                                                 alt={item.labPackage?.packageName}
                                                                 className="w-24 h-24 rounded-xl object-cover border border-gray-200 shadow-sm"
                                                                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"; }}

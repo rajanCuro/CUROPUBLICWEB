@@ -7,6 +7,7 @@ import axiosInstance from '../../../Authorization/axiosInstance';
 import AppointmentsList from './AppotmentList';
 import { FiFilter, FiList, FiSearch } from 'react-icons/fi';
 import { useLabAuth } from '../../../Authorization/LabAuthContext';
+import LoadingAnimation from '../../../LoaderSpinner';
 
 function LabAppointmentList() {
   const { userData } = useAuth();
@@ -73,12 +74,7 @@ function LabAppointmentList() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center hide-scrollbar">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading appointments...</p>
-        </div>
-      </div>
+      <LoadingAnimation />
     );
   }
 
@@ -148,7 +144,7 @@ function LabAppointmentList() {
       {/* Appointment List */}
       <AppointmentsList appointments={appointments} />
       {/* Pagination */}
-      
+
     </div>
   );
 }

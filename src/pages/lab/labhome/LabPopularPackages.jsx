@@ -5,36 +5,83 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchPopularPackages } from '../../../redux/features/labSilice';
 import { useAuth } from "../../../Authorization/AuthContext";
 import { useNavigate } from 'react-router-dom';
+import LoadingAnimation from '../../../LoaderSpinner';
+import axiosInstance from '../../../Authorization/axiosInstance';
+import { useLabAuth } from '../../../Authorization/LabAuthContext';
 
 function LabPopularPackages() {
   const [pageSize, setPageSize] = useState(10);
   const [pageNumber, setPageNumber] = useState(1);
   const [distance] = useState(5);
 
+  const { getAllLabCartItems, labCartItems } = useLabAuth();
+  const [packageId, setPackageId] = useState(null);
+
   const dispatch = useDispatch();
-  const { latitude, longitude } = useAuth();
+  const { latitude, longitude, userData, setAuthModal } = useAuth();
   const navigate = useNavigate();
+  const id = userData?.id;
 
   const { packages, loading } = useSelector((state) => state.packages);
 
-  // 🔥 Run API call when pageSize / location changes
+  // === FETCH ONLY IF STORE IS EMPTY ===
   useEffect(() => {
     if (!latitude || !longitude) return;
 
+    if (!packages || packages.length === 0) {
+      dispatch(
+        fetchPopularPackages({
+          pageSize,
+          pageNumber,
+          latitude,
+          longitude,
+          distance,
+        })
+      );
+    }
+  }, [latitude, longitude, dispatch]);
+
+  const loadMore = () => {
+    setPageSize((prev) => prev + 10);
+
     dispatch(
       fetchPopularPackages({
-        pageSize,
+        pageSize: pageSize + 10,
         pageNumber,
         latitude,
         longitude,
         distance,
       })
     );
-  }, [pageSize, pageNumber, latitude, longitude]);
+  };
 
-  // 🔥 Increase pageSize by 10 on Load More
-  const loadMore = () => {
-    setPageSize((prev) => prev + 10);
+  // === CHECK IF PACKAGE ALREADY IN CART ===
+  const isAlreadyInCart = (pkgId) => {
+    return labCartItems?.some((cart) => cart.labPackage?.id === pkgId);
+  };
+
+  // === ADD TO CART ===
+  const handleAddtoCart = async (e, item) => {
+    e.stopPropagation();
+
+    if (!id) {
+      setAuthModal(true);
+      return;
+    }
+
+    try {
+      setPackageId(item.labPackage.id);
+
+      const response = await axiosInstance.post(
+        `endUserEndPoint/addTestPackageToCart?userId=${id}&packageId=${item.labPackage.id}`
+      );
+
+      await getAllLabCartItems();
+      setPackageId(null);
+    } catch (error) {
+      console.log("Error adding to cart:", error);
+      setPackageId(null);
+    }
   };
 
   return (
@@ -47,19 +94,15 @@ function LabPopularPackages() {
       </div>
 
       {/* LOADING */}
-      {loading && packages.length === 0 && (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-        </div>
-      )}
+      {loading && packages.length === 0 && <LoadingAnimation />}
 
       {/* PACKAGES GRID */}
       <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
         {packages.map((item, index) => (
           <div
-            onClick={() => navigate('/labPackage_details', { state: item })}
             key={index}
-            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200 overflow-hidden transform hover:-translate-y-1"
+            onClick={() => navigate('/lab/labPackage_details', { state: item })}
+            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200 overflow-hidden transform hover:-translate-y-1 cursor-pointer"
           >
             {/* Top Section */}
             <div className="relative">
@@ -89,12 +132,10 @@ function LabPopularPackages() {
 
             {/* Content Section */}
             <div className="p-4">
-              {/* Package Title */}
               <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight line-clamp-2 group-hover:text-teal-700 transition-colors min-h-[2.5rem]">
                 {item.labPackage.packageName}
               </h3>
 
-              {/* Description */}
               <p className="text-gray-600 text-xs mt-1 line-clamp-2 leading-relaxed">
                 {item.labPackage.description}
               </p>
@@ -105,50 +146,40 @@ function LabPopularPackages() {
                   <span className="text-lg md:text-xl font-bold text-teal-700">
                     ₹{item.labPackage.price}
                   </span>
-
-                  {item.labPackage.originalPrice > item.labPackage.price && (
-                    <span className="text-xs text-gray-500 line-through">
-                      ₹{item.labPackage.originalPrice}
-                    </span>
-                  )}
                 </div>
-
-                {/* Rating */}
-                {item.rating && (
-                  <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
-                    <svg className="w-3 h-3 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="text-xs font-semibold text-gray-700">{item.rating}</span>
-                  </div>
-                )}
               </div>
 
-              {/* Features */}
-              {item.features?.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {item.features.slice(0, 2).map((feature, idx) => (
-                    <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                      {feature}
-                    </span>
-                  ))}
-
-                  {item.features.length > 2 && (
-                    <span className="text-xs text-gray-500">+{item.features.length - 2} more</span>
-                  )}
-                </div>
-              )}
-
-              {/* Action Button */}
-              <button className="mt-4 w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg group-hover:shadow-teal-200">
-                View Details
-              </button>
+              {/* === BUTTON SECTION === */}
+              <div className="mt-4">
+                {isAlreadyInCart(item.labPackage.id) ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/lab/cartitems");
+                    }}
+                    className="w-full border border-teal-700 text-teal-700 hover:bg-teal-100 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-md hover:shadow-lg"
+                  >
+                    Go to Cart
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => handleAddtoCart(e, item)}
+                    className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+                  >
+                    {packageId === item.labPackage.id ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* LOAD MORE BUTTON */}
+      {/* LOAD MORE */}
       {!loading && packages.length > 0 && (
         <div className="flex justify-center mt-8">
           <button
@@ -170,9 +201,7 @@ function LabPopularPackages() {
 
       {/* NO DATA */}
       {!loading && packages.length === 0 && (
-        <div className="text-center py-12 text-gray-600">
-          No packages found.
-        </div>
+        <div className="text-center py-12 text-gray-600">No packages found.</div>
       )}
     </div>
   );

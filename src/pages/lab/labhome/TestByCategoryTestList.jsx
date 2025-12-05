@@ -5,9 +5,10 @@ import axiosInstance from '../../../Authorization/axiosInstance'
 import { useAuth } from '../../../Authorization/AuthContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useLabAuth } from '../../../Authorization/LabAuthContext'
+import LoadingAnimation from '../../../LoaderSpinner'
 
 function TestByCategoryTestList() {
-    const { latitude, longitude } = useAuth()
+    const { latitude, longitude, setAuthModal } = useAuth()
     const { userData, getAllLabCartItems, labCartItems } = useLabAuth()
     const id = userData?.id
 
@@ -67,6 +68,11 @@ function TestByCategoryTestList() {
             setLoading(false)
         }
     }
+    if(loading){
+        return(
+            <LoadingAnimation/>
+        )
+    }
 
     const getPackageImage = (pkg) => {
         if (pkg.labPackage.packageImage) return pkg.labPackage.packageImage
@@ -81,6 +87,10 @@ function TestByCategoryTestList() {
     // 🚀 Add to cart without navigating
     const handleAddToCart = async (e, pkg) => {
         e.stopPropagation() // Prevent card click navigation
+        if (!id) {
+            setAuthModal(true)
+            return;
+        }
         setAddingId(pkg.labPackage.id)
         try {
             await axiosInstance.post(
@@ -140,7 +150,7 @@ function TestByCategoryTestList() {
                                 return (
                                     <div
                                         key={index}
-                                        onClick={() => navigate('/labPackage_details', { state: { pkg } })}
+                                        onClick={() => navigate('/lab/labPackage_details', { state: { pkg } })}
                                         className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col h-full"
                                     >
                                         <div className="relative h-48 bg-gray-200 overflow-hidden">
@@ -184,7 +194,7 @@ function TestByCategoryTestList() {
 
                                             {isInCart ? (
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); navigate('/lab/cart') }}
+                                                    onClick={(e) => { e.stopPropagation(); navigate('/lab/cartitems') }}
                                                     className="w-full mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg"
                                                 >
                                                     Go to Cart

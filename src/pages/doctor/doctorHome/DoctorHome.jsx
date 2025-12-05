@@ -2,6 +2,7 @@
 // src/pages/lab/doctor/doctorHome/DoctorHome.jsx
 
 import React, { useEffect } from 'react'
+import DoctorPopular from './DoctorPopular';
 
 function DoctorHome() {
   useEffect(() => {
@@ -144,6 +145,7 @@ function DoctorHome() {
           </button>
         </div>
       </div>
+   
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { useAuth } from "../../Authorization/AuthContext";
 import SimilarMedicineProduct from "./SimilarMedicineProduct";
 import NewArrivalsMedicine from "./NewArrivalsMedicine";
 import { BreadCrumb } from 'primereact/breadcrumb';
+import LoadingAnimation from "../../LoaderSpinner";
 function MedicneSubcategoryProduct() {
     const { id } = useParams(); // category ID
     const { latitude, longitude } = useAuth();
@@ -71,7 +72,7 @@ function MedicneSubcategoryProduct() {
     return (
         <div className="w-full md:container mx-auto mb-2">
             {/* Loading */}
-            {loading && <p className="text-gray-500">Loading...</p>}
+            {loading && ""}
 
             {/* Error */}
             {error && <p className="text-red-500">{error}</p>}
@@ -122,9 +123,7 @@ function MedicneSubcategoryProduct() {
                 <div className="w-full">
                     {/* Loader When Fetching */}
                     {fetching && (
-                        <div className="flex h-[40vh] items-center justify-center">
-                            <span className="loading loading-spinner loading-lg text-teal-600"></span>
-                        </div>
+                        <LoadingAnimation/>
                     )}
 
                     {/* No data when finished fetching */}

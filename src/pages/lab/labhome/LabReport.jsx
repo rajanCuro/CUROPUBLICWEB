@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../../Authorization/axiosInstance";
 import { useAuth } from "../../../Authorization/AuthContext";
+import LoadingAnimation from "../../../LoaderSpinner";
 
 function LabReport() {
     const { userData } = useAuth();
@@ -116,11 +117,7 @@ function LabReport() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center w-full py-20">
-                <div className="relative">
-                    <span className="loading loading-spinner loading-md"></span>
-                </div>
-            </div>
+            <LoadingAnimation/>
         );
     }
 

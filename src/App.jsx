@@ -15,7 +15,7 @@ function App() {
 
   return (
     // <div className='bg-[#f3f3f2] select-none'>
-    <div className='bg-[#f3f3f2] '>
+    <div className='wallpaper '>
       <Header />
       <Router />
       <Footer />

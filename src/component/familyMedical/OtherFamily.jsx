@@ -5,6 +5,7 @@ import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { SlCalender } from "react-icons/sl";
 import { MdDownload, MdEdit } from "react-icons/md";
+import LoadingAnimation from "../../LoaderSpinner";
 
 function OtherFamily() {
     const [prescriptionType, setPrescriptionType] = useState("Pharmacy");
@@ -91,9 +92,7 @@ function OtherFamily() {
 
             {/* Loader */}
             {loading && (
-                <div className="text-center text-gray-500 py-6 animate-pulse">
-                    Loading prescriptions...
-                </div>
+                <LoadingAnimation/>
             )}
 
             {/* No Records */}
