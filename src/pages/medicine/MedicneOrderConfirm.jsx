@@ -1,3 +1,4 @@
+// src/pages/medicine/MedicneOrderConfirm.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -127,7 +128,7 @@ function MedicineOrderConfirm() {
         {/* BUTTONS */}
         <div className="flex gap-3 mt-6">
           <button
-            onClick={() => navigate("/medicine")}
+            onClick={() => navigate("/medicine/delivery")}
             className="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold 
             hover:bg-gray-600 transition"
           >

@@ -33,7 +33,7 @@ function MedicineOrder() {
       const response = await axiosInstance.get(
         `/endUserEndPoint/getMedicineOrdersByEndUserId?endUserId=${id}`
       );
-      console.log("All order",response.data.dto)
+      console.log("All order", response.data.dto)
       setAllOrders(response.data.dto || []);
     } catch (err) {
       console.error("Get orders error:", err?.response ?? err);
@@ -135,11 +135,11 @@ function MedicineOrder() {
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-1 ${getStatusColor(order.status)}`}>
                 {order.status}
               </span>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTrackOrder(order);
-                }} 
+                }}
                 className='text-xs bg-teal-400 hover:bg-teal-600 text-white px-2 cursor-pointer py-1 rounded-lg mt-2 w-fit'
               >
                 Track Order
@@ -185,12 +185,10 @@ function MedicineOrder() {
         <td className="px-6 py-4">
           <div className="flex items-center space-x-3">
             <img
-              src={item.medicineBatch?.medicine?.imagesUrl?.[0] || '/placeholder-medicine.jpg'}
+              src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
               alt={item.medicineBatch?.medicine?.name || 'Medicine'}
-              className="w-12 h-12 object-cover rounded-lg border border-gray-200"
-              onError={(e) => {
-                e.target.src = '/placeholder-medicine.jpg';
-              }}
+              className="w-12 h-12 object-cover rounded-lg "
+              
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
@@ -205,7 +203,7 @@ function MedicineOrder() {
             </div>
           </div>
         </td>
-        
+
         {index === 0 && (
           <td className="px-6 py-4 whitespace-nowrap align-top" rowSpan={order.orderItems.length}>
             <div className="flex flex-col">
@@ -215,11 +213,11 @@ function MedicineOrder() {
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-2 ${getStatusColor(order.status)}`}>
                 {order.status}
               </span>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTrackOrder(order);
-                }} 
+                }}
                 className='text-xs bg-teal-400 hover:bg-teal-600 text-white px-2 cursor-pointer py-1 rounded-lg mt-2 w-fit'
               >
                 Track Order
@@ -256,36 +254,33 @@ function MedicineOrder() {
     <div className="md:p-6 container md:mx-auto">
       <div className="mb-6">
         <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">My Orders</h2>
-        
+
         {/* Filter Tabs */}
         <div className="flex space-x-2 mb-4">
           <button
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              activeFilter === 'all' 
-                ? 'bg-teal-600 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeFilter === 'all'
+              ? 'bg-teal-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             onClick={() => setActiveFilter('all')}
           >
             All Orders
           </button>
           <button
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-              activeFilter === 'medicine' 
-                ? 'bg-teal-600 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeFilter === 'medicine'
+              ? 'bg-teal-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             onClick={() => setActiveFilter('medicine')}
           >
             <MdLocalPharmacy />
             Medicine Orders
           </button>
           <button
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-              activeFilter === 'prescription' 
-                ? 'bg-teal-600 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeFilter === 'prescription'
+              ? 'bg-teal-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             onClick={() => setActiveFilter('prescription')}
           >
             <MdDescription />
@@ -302,11 +297,11 @@ function MedicineOrder() {
             </div>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">No Orders Found</h3>
             <p className="text-gray-500">
-              {activeFilter === 'all' 
-                ? "You haven't placed any orders yet." 
-                : activeFilter === 'medicine' 
-                ? "No medicine orders found." 
-                : "No prescription orders found."}
+              {activeFilter === 'all'
+                ? "You haven't placed any orders yet."
+                : activeFilter === 'medicine'
+                  ? "No medicine orders found."
+                  : "No prescription orders found."}
             </p>
           </div>
         </div>
@@ -328,8 +323,9 @@ function MedicineOrder() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrders.map((order) => renderOrderItems(order))}
+                {[...filteredOrders].reverse().map(order => renderOrderItems(order))}
               </tbody>
+
             </table>
           </div>
         </div>
@@ -338,7 +334,7 @@ function MedicineOrder() {
       {/* Modal remains the same */}
       {selectedOrder && (
         <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden hide-scrollbar">            
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden hide-scrollbar">
             <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
               <div className="flex justify-between items-center">
                 <div className='flex gap-4'>
@@ -442,12 +438,10 @@ function MedicineOrder() {
                     {selectedOrder.orderItems?.map((item) => (
                       <div key={item.id} className="flex items-center space-x-4 bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                         <img
-                          src={item.medicineBatch?.medicine?.imagesUrl?.[0] || '/placeholder-medicine.jpg'}
+                          src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
                           alt={item.medicineBatch?.medicine?.name}
-                          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                          onError={(e) => {
-                            e.target.src = '/placeholder-medicine.jpg';
-                          }}
+                          className="w-16 h-16 object-cover rounded-lg "
+                         
                         />
                         <div className="flex-1 min-w-0">
                           <h5 className="font-semibold text-gray-900 md:text-md text-xs mb-1">

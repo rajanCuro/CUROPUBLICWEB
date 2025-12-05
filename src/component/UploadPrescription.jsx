@@ -7,7 +7,7 @@ import MedicineUploadPrescription from '../pages/medicine/MedicineUploadPrescrip
 function UploadPrescription() {
     const { setAuthModal, token } = useAuth()
     const [uploadPrescriptionModal, setUploadPrescriptionModal] = useState(false)
-    const [uploadMode, setUploadMode] = useState("saved");
+    const [uploadMode, setUploadMode] = useState("continue");
 
     const handleUploadPrescription = () => {
         if (!token) {
