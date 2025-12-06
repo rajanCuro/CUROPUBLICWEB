@@ -117,7 +117,7 @@ function DoctorPopular() {
                     {popularDoctors.map((doctor) => (
                         <div
                             key={doctor.id}
-                            onClick={() => handleDoctorClick(doctor.id)}
+                            onClick={(e) => handleBookAppointment(doctor, e)}
                             className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100"
                         >
                             {/* Doctor Image */}

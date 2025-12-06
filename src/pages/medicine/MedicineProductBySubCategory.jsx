@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { FaPrescription } from "react-icons/fa";
 
 function MedicineProductBySubCategory({ productList = [], loading }) {
     const { userData, getAllMedicineCartItems, setAuthModal, allmedicineIncart } = useAuth();
@@ -59,8 +60,8 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                         />
 
                         {!item?.pharmacyMedicineBatch?.medicine?.otc && (
-                            <span className="absolute top-0 -right-2 z-10 text-[4px] md:text-[8px] bg-yellow-300 text-amber-900 rounded-full px-2 py-[2px] font-semibold">
-                                Prescription required
+                            <span className="absolute top-1 -right-1 z-10 text-[4px] md:text-[8px]  rounded-full px-2 py-[2px] font-semibold">
+                              <FaPrescription size={14} />
                             </span>
                         )}
                     </div>

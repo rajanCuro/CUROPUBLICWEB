@@ -151,7 +151,7 @@ const ShopByHealthConcernMedicne = () => {
                                     {/* Image Container */}
                                     <div className="relative w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-xl overflow-hidden p-6">
                                         <img
-                                            src={item.medicine?.imagesUrl[0]}
+                                            src={item.medicine?.imagesUrl?.[0]}
                                             alt={item.medicine?.name}
                                             className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
 

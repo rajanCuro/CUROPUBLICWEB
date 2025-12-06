@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DoctorPopular from './DoctorPopular';
 
 // Import doctor-related images (you'll need to add these to your project)
@@ -11,6 +11,7 @@ import DoctorPopular from './DoctorPopular';
 
 function DoctorHero() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const navigate = useNavigate()
 
     // Array of doctor-related images
     const doctorImages = [
@@ -97,6 +98,7 @@ function DoctorHero() {
                                 </Link>
                             </motion.button>
                             <motion.button
+                                onClick={() => navigate('/doctor/quick-consult')}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="px-8 py-3 border-2 cursor-pointer border-blue-500 text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors duration-300"

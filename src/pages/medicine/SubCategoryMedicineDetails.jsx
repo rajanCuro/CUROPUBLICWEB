@@ -153,7 +153,7 @@ function SubCategoryMedicineDetails() {
                 {/* RIGHT SECTION – ADD TO CART CARD */}
                 <div className="bg-white rounded-xl p-6 shadow-sm sticky top-10 flex flex-col justify-between h-[300px]">
                     <div>
-                        {!medicine.medicine?.otc && (<p className="text-red-500 flex items-center gap-1 mt-2 text-sm font-semibold"> <MdErrorOutline size={18} /> Prescription Required Medicine </p>)}
+                        {/* {!medicine.medicine?.otc && (<p className="text-red-500 flex items-center gap-1 mt-2 text-sm font-semibold"> <MdErrorOutline size={18} /> Prescription Required Medicine </p>)} */}
                         <p className="text-teal-600 text-2xl font-bold">
                             ₹{medicine?.unitPrice}
                         </p>
@@ -172,22 +172,17 @@ function SubCategoryMedicineDetails() {
                     {/* Add to Cart */}
                     <button
                         onClick={() => {
-                            if (medicine.medicine?.otc) {
-                                handleAddtocart(data);
-                            } else {
-                                alert("Please upload your prescription to proceed.");
-                            }
+                            handleAddtocart(data);
                         }}
                         className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
                     >
                         {addingCart ? (
                             <span className="loading loading-spinner loading-sm"></span>
-                        ) : medicine.medicine?.otc ? (
-                            "Add to cart"
                         ) : (
-                            "Upload your Prescription"
+                            "Add to cart"
                         )}
                     </button>
+
 
 
                 </div>
