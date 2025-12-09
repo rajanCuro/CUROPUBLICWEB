@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserdata] = useState(null);
   const [authModal, setAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  
 
   // const [latitude, setLatitude] = useState(25.33297); //25.33297
   // const [longitude, setLongitude] = useState(82.966293); // 82.966293

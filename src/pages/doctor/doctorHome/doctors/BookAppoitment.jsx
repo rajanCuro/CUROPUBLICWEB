@@ -1,3 +1,4 @@
+// src/pages/doctor/doctorHome/doctors/BookAppoitment.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaStar, FaVideo, FaClinicMedical, FaCheck, FaArrowLeft, FaCalendarAlt, FaClock, FaUser } from "react-icons/fa";

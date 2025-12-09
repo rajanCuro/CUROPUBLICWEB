@@ -200,7 +200,7 @@ const ShopByHealthConcernMedicne = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        navigate("/cart");
+                                                        navigate("/medicine/cart");
                                                     }}
                                                     className="w-full border-2 border-teal-600 bg-teal-50 hover:bg-teal-100 text-teal-700 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2"
                                                 >

@@ -58,7 +58,7 @@ function PaymentMethod() {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
-                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from.prescription || ""}&paymentMethod=COD`
+                `/endUserEndPoint/createPharmacyOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from.prescription || ""}&paymentMethod=COD`
             );
             localStorage.removeItem("recentAcceptedPrescriptionId")
             localStorage.removeItem("recentUplaodedPrescriptionIs")

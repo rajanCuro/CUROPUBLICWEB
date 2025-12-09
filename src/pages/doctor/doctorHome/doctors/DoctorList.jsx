@@ -81,7 +81,7 @@ function DoctorList() {
     // Handle book appointment
     const handleBookAppointment = (doctor) => {
         if (!doctor) return;
-        navigate('/doctor-doctor-details', { state: { doctor }, });
+        navigate('/doctor/doctor-details', { state: { doctor }, });
     };
 
 

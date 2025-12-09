@@ -5,9 +5,13 @@ import { CreditCard, Building2, Smartphone, CheckCircle, Lock, Shield } from 'lu
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const QuickConsultDoctorPayment = () => {
-    const location = useLocation();
-    const { doctor } = location.state || {};
-    console.log(doctor)
+    const { state } = useLocation();
+    const consultationData = state;
+    // Extract data
+    const doctor = consultationData?.doctor;
+    const consultationType = consultationData?.consultationType;
+    const fee = consultationData?.fee;
+    console.log(fee,consultationType)
     const [selectedMethod, setSelectedMethod] = useState('card');
     const [platformFee, setPlatformFee] = useState(49)
     const [loading, setLoading] = useState(false)
@@ -42,7 +46,7 @@ const QuickConsultDoctorPayment = () => {
         { id: 'yes', name: 'YES Bank', logo: '🏦' }
     ];
 
-    const totalAmount = Number(doctor?.consultationFee ?? 0) + Number(platformFee ?? 0);
+    const totalAmount = Number(fee ?? 0) + Number(platformFee ?? 0);
 
 
     const handleCardInputChange = (e) => {
@@ -296,7 +300,8 @@ const QuickConsultDoctorPayment = () => {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Subtotal</span>
-                                    <span className="font-medium">₹{doctor?.consultationFee}</span>
+                                    {console.log("payment", doctor)}
+                                    <span className="font-medium">₹{fee}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Platform Fee</span>

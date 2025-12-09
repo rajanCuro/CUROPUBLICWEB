@@ -23,7 +23,7 @@ import {
   FaMapMarkerAlt
 } from "react-icons/fa";
 import { HiHome } from "react-icons/hi";
-import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowDown, IoIosNotificationsOutline } from "react-icons/io";
 import Swal from "sweetalert2";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
@@ -206,7 +206,7 @@ const Header = () => {
             </motion.button>
 
             {/* Cart */}
-            <motion.button
+            {screen == "Doctor" ? <IoIosNotificationsOutline onClick={()=>navigate('/doctor/doctor/notifications')} size={24} className="cursor-pointer" /> : <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => activeMenu === "Pharmacy" ? navigate('/medicine/cart') : navigate('/lab/cartitems')}
@@ -218,7 +218,7 @@ const Header = () => {
                   {activeMenu === "Pharmacy" ? allmedicineIncart?.length || 0 : labCartItems?.length || 0}
                 </span>
               </div>
-            </motion.button>
+            </motion.button>}
 
             {/* Profile Section */}
             {token ? (
@@ -265,7 +265,7 @@ const Header = () => {
                 <span className="text-sm font-semibold">Login</span>
               </motion.button>
             )}
-        
+
 
             {/* Mobile Menu Button */}
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 text-gray-600 hover:text-teal-600 transition-colors">

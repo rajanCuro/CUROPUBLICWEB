@@ -1,4 +1,5 @@
-// src/pages/doctor/doctorHome/doctors/ViewDoctorDetails.jsx
+// src/pages/doctor/doctorHome/quickConsult/QuickViewDoctorDetails.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaStar, FaGraduationCap, FaHospitalAlt, FaCheckCircle } from "react-icons/fa";
@@ -6,11 +7,11 @@ import { MdWork, MdOutlineLanguage } from "react-icons/md";
 import { IoPersonCircleOutline, IoSchoolOutline } from "react-icons/io5";
 import { TbHeartPlus } from "react-icons/tb";
 
-export default function ViewDoctorDetails() {
+export default function QuickViewDoctorDetails() {
     const [consultTypeClinic, setConsultTypeClinic] = useState(null);
     const [consultTypeVideo, setConsultTypeVideo] = useState(null);
     const [selectedFee, setSelectedFee] = useState(0);
-
+    
     useEffect(() => {
         window.scrollTo({
             top: 0,
@@ -31,7 +32,6 @@ export default function ViewDoctorDetails() {
         recentConsultations: 120,
         image: "/doctor-image.jpg"
     };
-    console.log("check data", doctor)
 
     const navigate = useNavigate();
 
@@ -40,29 +40,28 @@ export default function ViewDoctorDetails() {
             alert("Please select a consultation type");
             return;
         }
-
+        
         const consultationData = {
             doctor,
             consultationType: consultTypeVideo ? "Video Consultation" : "In-Person Visit",
             fee: selectedFee
         };
         console.log(consultationData)
-
+        
         navigate('/doctor/quick-consult/payment', { state: consultationData });
     };
 
     const handleVideoSelect = () => {
         setConsultTypeVideo(true);
         setConsultTypeClinic(false);
-        setSelectedFee(doctor?.consultationFee || doctor.fees || 0);
+        setSelectedFee(doctor?.consultationFee);
     };
 
     const handleClinicSelect = () => {
         setConsultTypeVideo(false);
         setConsultTypeClinic(true);
-        setSelectedFee((doctor?.consultationFee || doctor.fees || 0) + 150);
+        setSelectedFee(doctor?.consultationFee + 150);
     };
-
 
     return (
         <div className="min-h-screen ">
@@ -72,10 +71,10 @@ export default function ViewDoctorDetails() {
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex items-start space-x-4">
                             <div className="">
-                                <img
-                                    src={doctor.image}
-                                    className='w-20 h-20 rounded-full object-cover'
-                                    alt={doctor.name}
+                                <img 
+                                    src={doctor.image} 
+                                    className='w-20 h-20 rounded-full object-cover' 
+                                    alt={doctor.name} 
                                 />
                             </div>
 
@@ -119,9 +118,16 @@ export default function ViewDoctorDetails() {
                                 <ul className="space-y-2 pl-7">
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
-                                        <span className='uppercase'>{doctor?.qualification}</span>
+                                        <span>MD, Harvard Medical School</span>
                                     </li>
-
+                                    <li className="flex items-start">
+                                        <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
+                                        <span>Board Certified in Pediatric Cardiology</span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
+                                        <span>Fellowship in Congenital Heart Disease</span>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -153,8 +159,8 @@ export default function ViewDoctorDetails() {
                                 <div className="overflow-x-auto">
                                     <div className="flex space-x-3">
                                         {doctor.languages?.map((language, index) => (
-                                            <span
-                                                key={index}
+                                            <span 
+                                                key={index} 
                                                 className="px-3 py-1 border border-teal-200 text-teal-400 bg-teal-50 rounded-md text-sm"
                                             >
                                                 {language}
@@ -255,28 +261,31 @@ export default function ViewDoctorDetails() {
                             <div className="space-y-4 mb-6">
                                 <div
                                     onClick={handleVideoSelect}
-                                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-200 ${consultTypeVideo
-                                        ? "bg-teal-100 border-teal-300 shadow-md"
-                                        : "bg-white border-gray-200 hover:bg-gray-50"
-                                        }`}
+                                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-200 ${
+                                        consultTypeVideo 
+                                            ? "bg-teal-100 border-teal-300 shadow-md" 
+                                            : "bg-white border-gray-200 hover:bg-gray-50"
+                                    }`}
                                 >
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-medium text-gray-700">Video Consultation</span>
-                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee || doctor?.fees || doctor?.fee}</span>
+                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee}</span>
                                     </div>
                                     <p className="text-sm text-gray-500">30-45 minutes • Available today</p>
                                 </div>
 
                                 <div
                                     onClick={handleClinicSelect}
-                                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-200 ${consultTypeClinic
-                                        ? "bg-teal-100 border-teal-300 shadow-md"
-                                        : "bg-white border-gray-200 hover:bg-gray-50"
-                                        }`}
+                                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-200 ${
+                                        consultTypeClinic 
+                                            ? "bg-teal-100 border-teal-300 shadow-md" 
+                                            : "bg-white border-gray-200 hover:bg-gray-50"
+                                    }`}
                                 >
                                     <div className="flex justify-between items-center mb-2">
+                                        {console.log("check",doctor)}
                                         <span className="font-medium text-gray-700">In-Person Visit</span>
-                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee + 150 || doctor?.fees + 150 || doctor?.fee + 150}</span>
+                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee + 150 }</span>
                                     </div>
                                     <p className="text-sm text-gray-500">60 minutes • By appointment</p>
                                 </div>
@@ -286,10 +295,11 @@ export default function ViewDoctorDetails() {
                                 <button
                                     onClick={handleProceedToPay}
                                     disabled={!selectedFee}
-                                    className={`w-full font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center ${selectedFee
-                                        ? "bg-teal-600 hover:bg-teal-700 text-white"
-                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                        }`}
+                                    className={`w-full font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center ${
+                                        selectedFee 
+                                            ? "bg-teal-600 hover:bg-teal-700 text-white" 
+                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    }`}
                                 >
                                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />

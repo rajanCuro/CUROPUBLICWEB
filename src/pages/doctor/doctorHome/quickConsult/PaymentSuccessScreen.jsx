@@ -14,9 +14,17 @@ const PaymentSuccessScreen = () => {
   const receiptRef = useRef(null);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate('/doctor/pendingConsultDoctor');
+    }, 2000);
+
+    return () => clearTimeout(timer); // cleanup
+  }, []);
+
+
+  useEffect(() => {
     function getFormattedDateTime() {
       const now = new Date();
-
       // ---- DATE ----
       const day = String(now.getDate()).padStart(2, "0");
       const monthNames = [
@@ -48,231 +56,7 @@ const PaymentSuccessScreen = () => {
   const transactionId = `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
   // Function to download PDF
-  const downloadPDF = () => {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const width = doc.internal.pageSize.getWidth();
-    const leftMargin = 20;
-    const rightMargin = width - 20;
-    let y = 25;
 
-    // Professional gradient header background (simulated with two rectangles)
-    doc.setFillColor(16, 163, 127);
-    doc.rect(0, 0, width, 60, 'F');
-    doc.setFillColor(5, 150, 105);
-    doc.rect(0, 0, width, 30, 'F');
-
-    // Header content
-    doc.setFontSize(28);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('MEDICAL CONSULTATION RECEIPT', width / 2, 35, { align: 'center' });
-
-    doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255, 0.9);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Official Payment Confirmation', width / 2, 43, { align: 'center' });
-
-    y = 70;
-
-    // Transaction Summary Card
-    doc.setFillColor(249, 250, 251);
-    doc.roundedRect(leftMargin, y, width - 40, 40, 3, 3, 'F');
-
-    doc.setFontSize(18);
-    doc.setTextColor(16, 163, 127);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`₹ ${amount}`, leftMargin + 15, y + 15);
-
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.setFont('helvetica', 'normal');
-    doc.text('TOTAL AMOUNT', leftMargin + 15, y + 22);
-
-    // Vertical divider
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.5);
-    doc.line(leftMargin + 70, y + 5, leftMargin + 70, y + 35);
-
-    // Transaction details
-    doc.setFontSize(10);
-    doc.setTextColor(75, 85, 99);
-    doc.text('Transaction ID:', leftMargin + 80, y + 15);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(31, 41, 55);
-    doc.text(transactionId, leftMargin + 110, y + 15);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(75, 85, 99);
-    doc.text('Date & Time:', leftMargin + 80, y + 25);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(31, 41, 55);
-    doc.text(currentDateTime, leftMargin + 110, y + 25);
-
-    y += 50;
-
-    // Doctor Information Section
-    doc.setFontSize(14);
-    doc.setTextColor(31, 41, 55);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DOCTOR INFORMATION', leftMargin, y);
-    y += 5;
-
-    // Horizontal line
-    doc.setDrawColor(16, 163, 127);
-    doc.setLineWidth(1);
-    doc.line(leftMargin, y, leftMargin + 60, y);
-    y += 10;
-
-    // Doctor card with subtle border
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(leftMargin, y, width - 40, 45, 2, 2, 'S');
-
-    // Doctor avatar placeholder
-    doc.setFillColor(209, 250, 229);
-    doc.circle(leftMargin + 25, y + 23, 15, 'F');
-    doc.setFontSize(16);
-    doc.setTextColor(5, 150, 105);
-    doc.text('DC', leftMargin + 23, y + 26);
-
-    // Doctor details
-    doc.setFontSize(14);
-    doc.setTextColor(31, 41, 55);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Dr. ${receipt?.name || 'Michael Chen'}`, leftMargin + 50, y + 15);
-
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(75, 85, 99);
-    doc.text(receipt?.specialization || 'Senior Cardiologist', leftMargin + 50, y + 25);
-
-    // Rating and experience with icons
-    doc.setFontSize(10);
-    doc.setTextColor(245, 158, 11);
-    doc.text('★', leftMargin + 50, y + 35);
-    doc.setTextColor(31, 41, 55);
-    doc.text(`${receipt?.rating || 4.9}/5`, leftMargin + 55, y + 35);
-
-    doc.setTextColor(156, 163, 175);
-    doc.text('•', leftMargin + 75, y + 35);
-
-    doc.setTextColor(75, 85, 99);
-    doc.text(`${receipt?.experience || 15} years experience`, leftMargin + 80, y + 35);
-
-    y += 55;
-
-    
-
-    // Horizontal line
-    doc.setDrawColor(16, 163, 127);
-    doc.setLineWidth(1);
-    doc.line(leftMargin, y, leftMargin + 85, y);
-    y += 15;
-
-    const column1X = leftMargin;
-    const column2X = width / 2;
-
-    // Column 1
-    
-
-    // Symptoms Section with improved styling
-    if (receipt?.symptoms?.length > 0) {
-      doc.setFontSize(14);
-      doc.setTextColor(31, 41, 55);
-      doc.setFont('helvetica', 'bold');
-      doc.text('REPORTED SYMPTOMS', leftMargin, y);
-      y += 5;
-
-      doc.setDrawColor(16, 163, 127);
-      doc.setLineWidth(1);
-      doc.line(leftMargin, y, leftMargin + 85, y);
-      y += 15;
-
-      let x = leftMargin;
-      receipt.symptoms.forEach((symptom, i) => {
-        const textWidth = doc.getStringUnitWidth(symptom) * doc.getFontSize() / doc.internal.scaleFactor;
-        const boxWidth = textWidth + 12;
-
-        if (x + boxWidth > rightMargin - 20) {
-          x = leftMargin;
-          y += 12;
-        }
-
-        // Modern pill design
-        doc.setFillColor(240, 253, 244);
-        doc.setDrawColor(220, 252, 231);
-        doc.setLineWidth(0.5);
-        doc.roundedRect(x, y - 6, boxWidth, 8, 4, 4, 'FD');
-
-        doc.setFontSize(9);
-        doc.setTextColor(21, 128, 61);
-        doc.setFont('helvetica', 'bold');
-        doc.text(symptom, x + 6, y);
-
-        x += boxWidth + 8;
-      });
-
-      y += 20;
-    }
-
-    // Payment Information
-
-
-    doc.setDrawColor(16, 163, 127);
-    doc.setLineWidth(1);
-    doc.line(leftMargin, y, leftMargin + 95, y);
-    y += 15;
-
-    // Payment details with subtle background
-    doc.setFillColor(249, 250, 251);
-    doc.roundedRect(leftMargin, y, width - 40, 35, 3, 3, 'F');
-
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(75, 85, 99);
-    doc.text('Total Amount:', leftMargin + 10, y + 12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(31, 41, 55);
-    doc.text(`₹ ${amount}`, leftMargin + 120, y + 12);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(75, 85, 99);
-    doc.text('Payment Method:', leftMargin + 10, y + 25);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(31, 41, 55);
-    doc.text('Visa •••• 4242', leftMargin + 120, y + 25);
-
-    y += 50;
-
-    // Professional footer
-    doc.setFontSize(9);
-    doc.setTextColor(156, 163, 175);
-    doc.setFont('helvetica', 'normal');
-    doc.text('This is an electronically generated receipt. No signature required.', width / 2, y, { align: 'center' });
-    y += 6;
-    doc.text('For any queries, contact support@healthcare.com or call +91-9876543210', width / 2, y, { align: 'center' });
-
-    // Company info
-    y += 15;
-    doc.setFontSize(10);
-    doc.setTextColor(16, 163, 127);
-    doc.setFont('helvetica', 'bold');
-    doc.text('MedCare Pro', width / 2, y, { align: 'center' });
-    y += 5;
-    doc.setFontSize(8);
-    doc.setTextColor(156, 163, 175);
-    doc.setFont('helvetica', 'normal');
-    doc.text('© 2024 MedCare Pro. All rights reserved.', width / 2, y, { align: 'center' });
-
-    // Add watermark
-    doc.setFontSize(20);
-    doc.setTextColor(243, 244, 246);
-    doc.setFont('helvetica', 'bold');
-    doc.text('PAID', width / 2, 150, { align: 'center', angle: 45 });
-
-    // Save the PDF
-    doc.save(`consultation-receipt-${transactionId}.pdf`);
-  };
 
   // Simplified HiddenReceipt component without problematic Tailwind classes
   const HiddenReceipt = () => (
@@ -610,7 +394,7 @@ const PaymentSuccessScreen = () => {
             className="space-y-4"
           >
             <motion.button
-              onClick={downloadPDF}
+         
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition-shadow duration-200 flex items-center justify-center space-x-2"

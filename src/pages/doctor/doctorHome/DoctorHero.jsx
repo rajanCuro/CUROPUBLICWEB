@@ -4,6 +4,7 @@ import { TypeAnimation } from 'react-type-animation';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import DoctorPopular from './DoctorPopular';
+import { useLabAuth } from '../../../Authorization/LabAuthContext';
 
 // Import doctor-related images (you'll need to add these to your project)
 // For demo purposes, I'm using placeholder URLs. Replace with your actual images.
@@ -11,7 +12,12 @@ import DoctorPopular from './DoctorPopular';
 
 function DoctorHero() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const { setScreen } = useLabAuth()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        setScreen('Doctor')
+    }, [])
 
     // Array of doctor-related images
     const doctorImages = [
