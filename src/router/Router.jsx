@@ -52,7 +52,6 @@ function Router() {
           <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
           <Route path='/prescription-waiting' element={<PrescriptionWaiting />} />
           <Route path='/medicine/payment/:prescription' element={<MedicinePaymentMethod />} />
-
           {/* footer routing */}
           <Route path='/privacy_policy' element={<PrivacyCenter />} />
           <Route path='/terms_of_service' element={<TermsAndConditions />} />

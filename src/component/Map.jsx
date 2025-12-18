@@ -25,8 +25,6 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// ⛳ Your LocationIQ Key
-// const LOCATIONIQ_KEY = "AIzaSyDQhTx-hV6s2j1v9YL9ewHJwJpTiFhdj00";
 const LOCATIONIQ_KEY = "pk.7895d307bfb8f6331b3a11da8ac5403f";
 
 function Map() {

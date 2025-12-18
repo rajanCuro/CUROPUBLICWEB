@@ -311,12 +311,12 @@ function DoctorHero() {
             </div>
             
             {/* Stats Section - Responsive grid */}
-            <motion.div
+            {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="container mx-auto px-4 py-8 md:py-12"
-            >
+             >
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div className="text-center p-4 bg-white/50 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-sm">
                         <div className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">500+</div>
@@ -331,7 +331,7 @@ function DoctorHero() {
                         <div className="text-gray-600 text-sm md:text-base">Patients Helped</div>
                     </div>
                 </div>
-            </motion.div>
+            </motion.div> */}
             
             <DoctorPopular />
         </div>
